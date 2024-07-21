@@ -1,7 +1,7 @@
-FROM python:3.9-slim
+# blog_service/Dockerfile
+FROM node:20
 WORKDIR /app
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY package.json ./
+RUN npm install
 COPY . .
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
-
+CMD ["node", "index.js"]

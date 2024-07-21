@@ -1,0 +1,13 @@
+db.users.find().pretty()
+show collections
+db.User.find().pretty()
+db.<collection_name>.find().pretty()
+show collections
+db.users.insertOne({ firstName: "John", lastName: "Doe", profilePicture: "path/to/picture.jpg", bio: "A short bio about John", motto: "Live and let live" })
+use touristDB
+show dbs
+db.runCommand({ connectionStatus:1})
+db.stats()
+show collections
+use touristDB
+show dbs

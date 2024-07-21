@@ -1,4 +1,0 @@
-django
-djongo
-pymongo
-djangorestframework

@@ -1,7 +1,8 @@
-version: '3.8'
+version: '2.28'
 services:
   mongo:
     image: 'mongo:latest'
+    stdin_open: true
     container_name: 'mongo'
     ports:
       - '27017:27017'
@@ -13,7 +14,7 @@ services:
   user-service:
     build: './user_service'
     ports:
-      - '8001:8000'
+      - '8001:8001'
     depends_on:
       - mongo
     networks:
@@ -22,7 +23,7 @@ services:
   blog-service:
     build: './blog_service'
     ports:
-      - '8002:8000'
+      - '8002:8002'
     depends_on:
       - mongo
     networks:
@@ -31,12 +32,27 @@ services:
   tour-service:
     build: './tour_service'
     ports:
-      - '8003:8000'
+      - '8003:8003'
     depends_on:
       - mongo
     networks:
       - backend-network
 
+  api-gateway:
+    build: './api_gateway'
+    ports:
+      - '8000:8000'
+    depends_on:
+      - user-service
+      - blog-service
+      - tour-service
+    networks:
+      - backend-network
+
+
 networks:
   backend-network:
     driver: bridge
+volumes:
+  mongo-data:
+    driver: local
