@@ -2,12 +2,11 @@ version: '2.28'
 services:
   mongo:
     image: 'mongo:latest'
-    stdin_open: true
     container_name: 'mongo'
     ports:
       - '27017:27017'
     volumes:
-      - ./data:/data/db
+      - mongo-data:/data/db
     networks:
       - backend-network
 
@@ -49,10 +48,9 @@ services:
     networks:
       - backend-network
 
+volumes:
+  mongo-data:
 
 networks:
   backend-network:
     driver: bridge
-volumes:
-  mongo-data:
-    driver: local

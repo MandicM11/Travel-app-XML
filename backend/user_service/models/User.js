@@ -11,6 +11,6 @@ const UserSchema = new mongoose.Schema({
     role: { type: String, enum: ['tourist', 'guide'], required: true }
 });
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('user', UserSchema);
 
 module.exports = User;
