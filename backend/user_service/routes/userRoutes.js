@@ -1,7 +1,7 @@
 // user_service/routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user'); // Proveri da li je putanja tačna
+const User = require('../models/User'); // Proveri da li je putanja tačna
 
 // Dummy GET ruta
 router.get('/', (req, res) => {

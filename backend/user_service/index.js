@@ -1,9 +1,10 @@
-// user_service/index.js
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
+const cors = require('cors');
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 // MongoDB konekcija
