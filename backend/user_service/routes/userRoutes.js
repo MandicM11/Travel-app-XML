@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
     res.send('User Service');
 });
 
+
 // Registracija korisnika
 router.post('/register', async (req, res) => {
     try {

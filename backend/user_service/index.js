@@ -17,7 +17,7 @@ mongoose.connect('mongodb://mongo:27017/touristDB', {
 });
 
 // Koristi rute
-app.use('/user-service', userRoutes);
+app.use(userRoutes);
 
 const PORT = process.env.PORT || 8001;
 app.listen(PORT, () => {
