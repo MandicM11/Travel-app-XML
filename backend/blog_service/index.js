@@ -1,27 +1,23 @@
-// user_service/index.js
 const express = require('express');
 const mongoose = require('mongoose');
-const app = express();
+const blogRoutes = require('./routes/blogRoutes');
 
-// Middleware za parsiranje JSON-a
+const app = express();
 app.use(express.json());
 
-// Povezivanje sa MongoDB
+// MongoDB konekcija
 mongoose.connect('mongodb://mongo:27017/touristDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('Failed to connect to MongoDB', err);
 });
 
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+app.use(blogRoutes);
 
-// Osnovna ruta
-app.get('/', (req, res) => {
-    res.send('Blog Service');
-});
-
-const PORT = process.env.PORT || 8002;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 8002;
+app.listen(port, () => {
+  console.log(`Blog service running on port ${port}`);
 });
