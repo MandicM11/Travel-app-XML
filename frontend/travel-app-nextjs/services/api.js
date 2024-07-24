@@ -1,12 +1,16 @@
 import axios from 'axios';
 
-const api = axios.create({
-    baseURL: 'http://localhost:8000/user-service', // Osnovna URL adresa za API
+const userApi = axios.create({
+    baseURL: 'http://localhost:8000/user-service',
+});
+
+const blogApi = axios.create({
+    baseURL: 'http://localhost:8000/blog-service',
 });
 
 export const registerUser = async (userData) => {
     try {
-        const response = await api.post('/register', userData);
+        const response = await userApi.post('/register', userData);
         return response.data;
     } catch (error) {
         throw error;
@@ -15,7 +19,21 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (userData) => {
     try {
-        const response = await api.post('/login', userData);
+        const response = await userApi.post('/login', userData);
+       
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createBlog = async (blogData, token) => {
+    try {
+        const response = await blogApi.post('/create', blogData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
         return response.data;
     } catch (error) {
         throw error;
