@@ -6,6 +6,28 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Validacija ID-a
+    if (!id) {
+      return res.status(400).send({ error: 'Blog ID is required.' });
+    }
+
+    // Pretraživanje bloga u bazi podataka
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).send({ error: 'Blog not found.' });
+    }
+
+    res.status(200).send(blog);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 router.post('/create', authMiddleware, async (req, res) => {
   const { title, description, creationDate, images, status } = req.body;
 
