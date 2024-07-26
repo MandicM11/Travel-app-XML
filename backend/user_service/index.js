@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
+const followRoutes = require('./routes/follow');
 const cors = require('cors');
+const authMiddleware = require('./middleware/authMiddleware')
 const app = express();
 
 // Middleware
@@ -20,6 +22,7 @@ mongoose.connect('mongodb://mongo:27017/touristDB', {
 
 // Koristi rute
 app.use(userRoutes);
+app.use(authMiddleware,followRoutes);
 
 const PORT = process.env.PORT || 8001;
 app.listen(PORT, () => {

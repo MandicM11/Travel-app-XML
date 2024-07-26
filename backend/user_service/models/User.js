@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     motto: String,
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, required: true }
+    role: { type: String, required: true },
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { collection: 'users' }); // Eksplicitno postavljanje imena kolekcije
 
 const User = mongoose.model('User', userSchema);

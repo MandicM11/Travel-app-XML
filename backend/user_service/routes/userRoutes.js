@@ -5,9 +5,18 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const SECRET_KEY = '12345';
 
-// Dummy GET ruta
-router.get('/', (req, res) => {
-    res.send('User Service');
+
+//Get user ruta
+router.get('/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password'); // Isključujemo polje password
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+        res.send(user);
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
 });
 
 // Registracija korisnika
