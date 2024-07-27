@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+// components/CommentForm.js
+import { useState } from 'react';
 import axios from 'axios';
 
-const CommentForm = ({ blogId }) => {
+const CommentForm = ({ blogId, onCommentAdded }) => {
   const [content, setContent] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!content.trim()) return;
+
     try {
-      await axios.post(`/api/comments/${blogId}`, { content }, {
-        withCredentials: true,
-      });
-      alert('Comment added successfully');
-    } catch (err) {
-      alert('Error adding comment');
+      await axios.post(`http://localhost:8000/blog-service/${blogId}/comments`, { content });
+      onCommentAdded();
+      setContent('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   };
 

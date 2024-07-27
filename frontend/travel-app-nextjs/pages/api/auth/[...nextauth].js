@@ -1,54 +1,57 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { loginUser } from '../../../services/api';
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = '12345'; // Koristi isti tajni ključ kao na backendu
 
 export default NextAuth({
-    providers: [
-        CredentialsProvider({
-            name: 'Credentials',
-            credentials: {
-                email: { label: 'Email', type: 'email' },
-                password: { label: 'Password', type: 'password' }
-            },
-            async authorize(credentials) {
-                try {
-                    const user = await loginUser(credentials);
-                    if (user) {
-                        return user;
-                    } else {
-                        return null;
-                    }
-                } catch (error) {
-                    throw new Error('Invalid credentials');
-                }
-            }
-        })
-    ],
-    secret: '12345',
-    session: {
-        strategy: 'jwt', // Koristite JWT za sesije
-    },
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.user = user;
-            }
-            return token;
-        },
-        async session({ session, token }) {
-            session.user = token.user;
-            return session;
+  providers: [
+    CredentialsProvider({
+      async authorize(credentials) {
+        const res = await fetch('http://localhost:8001/login', { // Zameni URL ako je potrebno
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        });
+
+        const user = await res.json();
+
+        if (res.ok && user) {
+          return user;
+        } else {
+          throw new Error(user.error || 'Invalid credentials');
         }
+      },
+    }),
+  ],
+  session: {
+    strategy: 'jwt',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Sačuvaj korisničke podatke u token
+        token.id = user._id;
+        token.email = user.email;
+        token.role = user.role;
+      }
+      return token;
     },
-    cookies: {
-        sessionToken: {
-            name: `next-auth.session-token`,
-            options: {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // koristi secure samo u produkciji
-                sameSite: 'lax',
-                path: '/',
-            }
-        }
-    }
+    async session({ session, token }) {
+      // Sačuvaj podatke iz tokena u sesiji
+      session.user = {
+        id: token.id,
+        email: token.email,
+        role: token.role,
+      };
+      return session;
+    },
+  },
+  secret: SECRET_KEY, // Tajni ključ za enkripciju
+  pages: {
+    signIn: '/login', // Putanja do tvoje stranice za prijavu
+  },
 });

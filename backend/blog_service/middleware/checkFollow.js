@@ -1,12 +1,27 @@
 const axios = require('axios');
+const jwt = require('jsonwebtoken'); // Ako koristite JWT za verifikaciju tokena
 const Blog = require('../models/Blog');
+const SECRET_KEY = '12345'; // Tajni ključ za verifikaciju tokena
 
 const USER_SERVICE_URL = 'http://api-gateway:8000/user-service'; // URL za pristup korisnicima preko API Gateway-a
 
 const checkFollow = async (req, res, next) => {
     try {
+        // Očitavanje tokena iz kolačića
+        const token = req.cookies['session-token']; // Provjerite da li je ovo ime u skladu sa imenom u Postmanu
+
+        console.log('Token from cookies in checkFollow:', token); // Logovanje tokena za provere
+
+        if (!token) {
+            return res.status(401).send({ error: 'No token provided' });
+        }
+
+        // Verifikacija tokena
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded; // Dodeljujemo korisnika za dalje korišćenje
+
         const userId = req.user._id;
-        const blogId = req.params.id; // Koristi req.params.id umesto req.params.blogId
+        const blogId = req.params.id;
 
         console.log(`Checking follow for userId: ${userId} and blogId: ${blogId}`);
 

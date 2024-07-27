@@ -1,12 +1,17 @@
-// pages/_app.js
+import '../styles/globals.css'; // Uključite globalne stilove
+import 'bootstrap/dist/css/bootstrap.min.css'; // Uključivanje Bootstrap CSS-a
 import { SessionProvider } from 'next-auth/react';
+import NavigationBar from '../components/Navbar'; // Uvozite navigacioni bar
 
 function MyApp({ Component, pageProps }) {
   return (
     <SessionProvider session={pageProps.session}>
-      <Component {...pageProps} />
+      <NavigationBar /> {/* Dodajte navigacioni bar */}
+      <main>
+        <Component {...pageProps} />
+      </main>
     </SessionProvider>
   );
 }
 
-export default MyApp;
+export default MyApp; 

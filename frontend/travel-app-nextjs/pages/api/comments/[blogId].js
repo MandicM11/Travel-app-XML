@@ -1,20 +1,51 @@
-// pages/api/comments/[blogId].js
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import CommentForm from '../../components/CommentForm';
+import { Container, ListGroup, Spinner } from 'react-bootstrap'; // Uvezi Bootstrap komponente
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      const { blogId } = req.query;
-      const { content } = req.body;
-      const response = await axios.post(`http://localhost:8000/blog-service/${blogId}/comments`, { content }, {
-        withCredentials: true,
-        headers: {
-          'Authorization': `Bearer ${req.cookies.token}`
-        }
-      });
-      res.status(200).json(response.data);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+const CommentsPage = () => {
+  const router = useRouter();
+  const { blogId } = router.query;
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (blogId) {
+      fetchComments();
     }
+  }, [blogId]);
+
+  const fetchComments = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/blog-service/${blogId}/comments`);
+      setComments(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container className="text-center">
+        <Spinner animation="border" />
+      </Container>
+    );
   }
-}
+
+  return (
+    <Container>
+      <h1>Comments for Blog {blogId}</h1>
+      <ListGroup>
+        {comments.map(comment => (
+          <ListGroup.Item key={comment._id}>{comment.content}</ListGroup.Item>
+        ))}
+      </ListGroup>
+      <CommentForm blogId={blogId} />
+    </Container>
+  );
+};
+
+export default CommentsPage;

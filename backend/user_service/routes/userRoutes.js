@@ -1,12 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Proveri da li je putanja tačna
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const SECRET_KEY = '12345';
+const cookieParser = require('cookie-parser'); // Importuj cookie-parser
 
+// Middleware za čitanje kolačića
+router.use(cookieParser());
 
-//Get user ruta
+// Ruta za dobavljanje svih korisnika
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find().select('-password'); // Isključujemo polje password
+        res.send(users);
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
+
+// Get user ruta
 router.get('/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password'); // Isključujemo polje password
@@ -47,7 +60,15 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
-        res.send({ message: 'Login successful', token, user });
+        // Postavi token kao kolačić
+        res.cookie('session-token', token, {
+            //httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // koristi secure samo u produkciji
+            sameSite: 'lax',
+            path: '/'
+        });
+
+        res.send({ message: 'Login successful', user });
     } catch (error) {
         res.status(400).send({ error: error.message });
     }

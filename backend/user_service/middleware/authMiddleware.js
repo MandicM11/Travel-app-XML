@@ -3,20 +3,16 @@ const SECRET_KEY = '12345';
 
 const authMiddleware = (req, res, next) => {
     try {
-        // Uzimanje Authorization header-a iz zahteva
-        const authHeader = req.headers['authorization'];
+        // Uzimanje kolačića iz zahteva
+        const token = req.cookies['session-token'];
 
-        // Ako authHeader nije prisutan, vraća grešku 401
-        if (!authHeader) {
+        // Ako token nije prisutan, vraća grešku 401
+        if (!token) {
             return res.status(401).send({ error: 'No token provided' });
         }
 
-        // Uklanjanje 'Bearer ' prefiksa, ako postoji
-        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-
         // Verifikacija JWT tokena
         jwt.verify(token, SECRET_KEY, (err, user) => {
-        
             if (err) {
                 return res.status(403).send({ error: 'Invalid token' });
             }

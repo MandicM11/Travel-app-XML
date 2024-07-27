@@ -1,0 +1,78 @@
+/* styles/globals.css */
+
+/* Osnovni stilovi za celo telo */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    color: #343a40;
+  }
+  
+  /* Stilovi za navigacioni bar */
+  nav {
+    background-color: #007bff; /* Boja pozadine navigacije */
+    padding: 0.5rem 1rem; /* Padding */
+  }
+  
+  nav a {
+    color: white; /* Boja teksta */
+    text-decoration: none; /* Uklanjanje podvlačenja */
+    padding: 0.5rem 1rem; /* Padding za linkove */
+  }
+  
+  nav a:hover {
+    background-color: #0056b3; /* Tamnija boja na hover */
+    border-radius: 4px; /* Zaobljeni uglovi */
+  }
+  
+  /* Stilovi za kontejnere i raspored */
+  .container {
+    max-width: 1200px; /* Maksimalna širina sadržaja */
+    margin: 0 auto; /* Centriranje sadržaja */
+    padding: 2rem; /* Padding oko sadržaja */
+  }
+  
+  h1, h2, h3 {
+    margin-bottom: 1rem; /* Razmak ispod naslova */
+  }
+  
+  ul {
+    list-style-type: none; /* Uklanjanje oznaka lista */
+    padding: 0; /* Uklanjanje paddinga */
+  }
+  
+  li {
+    padding: 0.5rem 0; /* Padding za stavke liste */
+    border-bottom: 1px solid #ddd; /* Razdvajanje stavki liste */
+  }
+  
+  /* Stilovi za dugmad */
+  button {
+    border: none; /* Uklanjanje ivica */
+    padding: 0.5rem 1rem; /* Padding za dugmadi */
+    border-radius: 4px; /* Zaobljeni uglovi */
+    cursor: pointer; /* Kursor kao ruka na hover */
+  }
+  
+  button:hover {
+    background-color: #0056b3; /* Pozadinska boja na hover */
+    color: white; /* Boja teksta na hover */
+  }
+  
+  /* Stilovi za forme */
+  form {
+    margin: 1rem 0; /* Razmak oko formi */
+  }
+  
+  input, textarea {
+    width: 100%; /* Širina 100% za input i textarea */
+    padding: 0.5rem; /* Padding unutar inputa */
+    border: 1px solid #ddd; /* Oko inputa */
+    border-radius: 4px; /* Zaobljeni uglovi */
+  }
+  
+  input:focus, textarea:focus {
+    border-color: #007bff; /* Boja ivica na focus */
+    outline: none; /* Uklanjanje outline */
+  }
+  

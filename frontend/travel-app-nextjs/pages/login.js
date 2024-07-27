@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { loginUser } from '../services/api';
 
 const Login = () => {
     const [form, setForm] = useState({
@@ -16,20 +16,16 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Reset error before trying to login
+        setError('');
 
         try {
-            const result = await signIn('credentials', {
-                redirect: false,
-                email: form.email,
-                password: form.password,
-            });
+            const result = await loginUser(form);
+            console.log('Login result:', result); // Dodaj ovu liniju
 
             if (result.error) {
-                // Ako postoji greška, postavite je u stanje
                 setError(result.error);
             } else {
-                // Ako prijava uspe, preusmerite korisnika
+                console.log('Redirecting to /create'); // Dodaj ovu liniju
                 router.push('/create');
             }
         } catch (error) {

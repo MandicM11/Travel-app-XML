@@ -1,34 +1,26 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Container, Navbar, Nav } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Uvezi Bootstrap stilove
 
 const Index = () => {
-  const [domLoaded, setDomLoaded] = useState(false);
-
-  useEffect(() => {
-    setDomLoaded(true);
-  }, []);
-
-  if (!domLoaded) {
-    // Ovo možeš da vratiš kao loading state ili nešto drugo dok DOM nije učitan
-    return <div>Loading...</div>;
-  }
-
   return (
     <div>
-      <h1>Welcome to the App</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/register">Register</Link>
-          </li>
-          <li>
-            <Link href="/login">Login</Link>
-          </li>
-          <li>
-            <Link href="/create">Create a new Blog</Link>
-          </li>
-        </ul>
-      </nav>
+      <Navbar bg="primary" variant="dark" expand="lg">
+        <Container>
+          <Navbar.Brand href="/">MyApp</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link href="/register">Register</Nav.Link>
+              <Nav.Link href="/login">Login</Nav.Link>
+              <Nav.Link href="/create">Create a new Blog</Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      <Container>
+        <h1>Welcome to the App</h1>
+      </Container>
     </div>
   );
 };

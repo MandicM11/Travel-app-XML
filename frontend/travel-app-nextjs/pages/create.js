@@ -1,30 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { createBlog } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { Form, Button } from 'react-bootstrap';
+import Cookies from 'js-cookie';
 
 const CreateBlog = () => {
     const { data: session, status } = useSession();
-    const router = useRouter(); // Dodajte useRouter za redirekciju
+    const router = useRouter();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        creationDate: '',
+        creationDate: new Date(),
         images: [],
         status: 'draft'
     });
 
-    // Prikažite poruku dok se učitava sesija
+    useEffect(() => {
+        const token = Cookies.get('session-token');
+        console.log('Token from cookies on load:', token);
+
+        if (!session && !token) {
+            console.log('No session found, redirecting to /login');
+            router.push('/login');
+        }
+    }, [session, router]);
+
     if (status === 'loading') {
         return <p>Loading...</p>;
     }
-
-    // Ako korisnik nije prijavljen, preusmerite na login stranicu
-    if (!session) {
-        router.push('/login');
-        return null;
-    }
-    console.log('Session:', session);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,60 +50,91 @@ const CreateBlog = () => {
         }
     };
 
+    const handleDateChange = (date) => {
+        setFormData({ ...formData, creationDate: date });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await createBlog(formData, session.user.token);
+            const token = Cookies.get('session-token');
+            console.log('Token from cookies on submit:', token);
+
+            if (!token) {
+                throw new Error('No session token found');
+            }
+
+            const response = await createBlog(formData);
             console.log('Blog created:', response);
-            // Redirektujte korisnika na stranicu nakon uspešnog kreiranja bloga
-            router.push('/'); // Promenite putanju ako želite da preusmerite na drugu stranicu
+            router.push('/');
         } catch (error) {
             console.error('Error creating blog:', error);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <h1>Create Blog</h1>
-            <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Title"
-                required
-            />
-            <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Description"
-                required
-            />
-            <input
-                type="date"
-                name="creationDate"
-                value={formData.creationDate}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="file"
-                name="images"
-                onChange={handleFileChange}
-            />
-            <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                required
-            >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="closed">Closed</option>
-            </select>
-            <button type="submit">Create Blog</button>
-        </form>
+            <Form.Group controlId="formTitle">
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Title"
+                    required
+                />
+            </Form.Group>
+
+            <Form.Group controlId="formDescription">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                    as="textarea"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Description"
+                    required
+                />
+            </Form.Group>
+
+            <Form.Group controlId="formCreationDate">
+                <Form.Label>Creation Date</Form.Label>
+                <DatePicker
+                    selected={formData.creationDate}
+                    onChange={handleDateChange}
+                    className="form-control"
+                    dateFormat="yyyy/MM/dd"
+                />
+            </Form.Group>
+
+            <Form.Group controlId="formImages">
+                <Form.Label>Images</Form.Label>
+                <Form.Control
+                    type="file"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                />
+            </Form.Group>
+
+            <Form.Group controlId="formStatus">
+                <Form.Label>Status</Form.Label>
+                <Form.Control
+                    as="select"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                >
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                </Form.Control>
+            </Form.Group>
+
+            <Button variant="primary" type="submit">
+                Submit
+            </Button>
+        </Form>
     );
 };
 
