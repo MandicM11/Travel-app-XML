@@ -66,6 +66,9 @@ router.get('/follow-status/:followingId', authMiddleware, async (req, res) => {
         const { followingId } = req.params;
         const followerId = req.user._id;
 
+        console.log('Follower ID:', followerId);
+        console.log('Following ID:', followingId);
+
         const existingFollow = await Follow.findOne({ follower: followerId, following: followingId });
 
         res.status(200).json({ isFollowing: !!existingFollow });

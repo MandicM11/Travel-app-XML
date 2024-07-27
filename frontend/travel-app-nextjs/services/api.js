@@ -1,16 +1,25 @@
 import axios from 'axios';
+import { getSession } from 'next-auth/react';
 
 const userApi = axios.create({
     baseURL: 'http://localhost:8001',
-    withCredentials: true, // Osiguraj da kolačići budu uključeni u zahteve
+    withCredentials: true,
 });
 
 const blogApi = axios.create({
     baseURL: 'http://localhost:8002',
-    withCredentials: true, // Osiguraj da kolačići budu uključeni u zahteve
+    withCredentials: true,
 });
 
-// Helper za postavljanje autorizacionog tokena nije potreban više
+userApi.interceptors.request.use(async (config) => {
+    const session = await getSession();
+    if (session) {
+        config.headers.Authorization = `Bearer ${session.user.token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
 export const getBlogs = async () => {
     try {
@@ -31,7 +40,6 @@ export const registerUser = async (userData) => {
     }
 };
 
-// Prijava korisnika na osnovu rute na backendu
 export const loginUser = async (userData) => {
     try {
         const response = await userApi.post('/login', userData);
@@ -67,6 +75,47 @@ export const addComment = async (blogId, content) => {
         const response = await blogApi.post(`/${blogId}/comments`, { content });
         return response.data;
     } catch (error) {
+        throw error;
+    }
+};
+
+export const getUsers = async () => {
+    try {
+        const response = await userApi.get('/users');
+        console.log('Fetched users:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+};
+
+export const getFollowStatus = async (followingId) => {
+    try {
+        const response = await userApi.get(`/follow-status/${followingId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching follow status:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const followUser = async (followingId) => {
+    try {
+        const response = await userApi.post('/follow', { followingId });
+        return response.data;
+    } catch (error) {
+        console.error('Error following user:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const unfollowUser = async (followingId) => {
+    try {
+        const response = await userApi.delete(`/unfollow/${followingId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error unfollowing user:', error.response ? error.response.data : error.message);
         throw error;
     }
 };

@@ -38,6 +38,7 @@ export default NextAuth({
         token.email = user.email;
         token.role = user.role;
       }
+      console.log('JWT Token:', token); // Dodaj ovu liniju
       return token;
     },
     async session({ session, token }) {
@@ -47,6 +48,7 @@ export default NextAuth({
         email: token.email,
         role: token.role,
       };
+      console.log('Session Data:', session); // Dodaj ovu liniju
       return session;
     },
   },

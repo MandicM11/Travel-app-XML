@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import FollowButton from '../components/FollowButton';
 import { useSession } from 'next-auth/react';
+import FollowButton from '../components/FollowButton';
+import { getUsers } from '../services/api';
 
 const FollowPage = () => {
   const { data: session } = useSession();
@@ -9,12 +9,12 @@ const FollowPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!session) return;
+
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/user-service/users', {
-          headers: { Authorization: `Bearer ${session?.user?.token}` }
-        });
-        setUsers(response.data);
+        const response = await getUsers();
+        setUsers(response);
         setLoading(false);
       } catch (error) {
         console.error('Error loading users:', error);
@@ -22,9 +22,7 @@ const FollowPage = () => {
       }
     };
 
-    if (session) {
-      fetchUsers();
-    }
+    fetchUsers();
   }, [session]);
 
   if (loading) {
