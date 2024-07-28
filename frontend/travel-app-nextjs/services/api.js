@@ -13,7 +13,9 @@ const blogApi = axios.create({
 
 userApi.interceptors.request.use(async (config) => {
     const session = await getSession();
+    console.log('Interceptor - session:', session); // Dodaj log ovde
     if (session) {
+        console.log('Interceptor - session token:', session.user.token); // Dodaj log ovde
         config.headers.Authorization = `Bearer ${session.user.token}`;
     }
     return config;

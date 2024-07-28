@@ -8,7 +8,7 @@ export default NextAuth({
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
-        const res = await fetch('http://localhost:8001/login', { // Zameni URL ako je potrebno
+        const res = await fetch('http://localhost:8001/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -18,6 +18,7 @@ export default NextAuth({
         });
 
         const user = await res.json();
+        console.log('User from backend:', user); // Dodaj log ovde
 
         if (res.ok && user) {
           return user;
@@ -33,27 +34,27 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Sačuvaj korisničke podatke u token
         token.id = user._id;
         token.email = user.email;
         token.role = user.role;
+        token.accessToken = user.token; // Dodaj token ovde
       }
       console.log('JWT Token:', token); // Dodaj ovu liniju
       return token;
     },
     async session({ session, token }) {
-      // Sačuvaj podatke iz tokena u sesiji
       session.user = {
         id: token.id,
         email: token.email,
         role: token.role,
+        token: token.accessToken, // Dodaj token ovde
       };
       console.log('Session Data:', session); // Dodaj ovu liniju
       return session;
     },
   },
-  secret: SECRET_KEY, // Tajni ključ za enkripciju
+  secret: SECRET_KEY,
   pages: {
-    signIn: '/login', // Putanja do tvoje stranice za prijavu
+    signIn: '/login',
   },
 });

@@ -17,6 +17,7 @@ const CreateBlog = () => {
         images: [],
         status: 'draft'
     });
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const token = Cookies.get('session-token');
@@ -56,11 +57,14 @@ const CreateBlog = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+
         try {
             const token = Cookies.get('session-token');
             console.log('Token from cookies on submit:', token);
 
             if (!token) {
+                setError('You must be logged in to create a blog.');
                 throw new Error('No session token found');
             }
 
@@ -69,13 +73,14 @@ const CreateBlog = () => {
             router.push('/');
         } catch (error) {
             console.error('Error creating blog:', error);
+            setError('Failed to create blog. Please try again.');
         }
-        
     };
 
     return (
         <Form onSubmit={handleSubmit}>
             <h1>Create Blog</h1>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <Form.Group controlId="formTitle">
                 <Form.Label>Title</Form.Label>
                 <Form.Control
