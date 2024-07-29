@@ -58,10 +58,10 @@ router.post('/login', async (req, res) => {
             return res.status(401).send({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' , algorithm: 'HS256'});
 
         // Postavi token kao kolačić
-        res.cookie('session-token', token, {
+        res.cookie('next-auth.session-token', token, {
             //httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // koristi secure samo u produkciji
             sameSite: 'lax',

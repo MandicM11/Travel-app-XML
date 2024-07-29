@@ -4,7 +4,7 @@ const SECRET_KEY = '12345';
 const authMiddleware = (req, res, next) => {
     try {
         // Uzimanje kolačića iz zahteva
-        const token = req.cookies['session-token'];
+        const token = req.cookies['next-auth.session-token'];
 
         // Ako token nije prisutan, vraća grešku 401
         if (!token) {

@@ -20,7 +20,7 @@ const CreateBlog = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const token = Cookies.get('session-token');
+        const token = Cookies.get('next-auth.session-token');
         console.log('Token from cookies on load:', token);
 
         if (!session && !token) {
@@ -60,7 +60,7 @@ const CreateBlog = () => {
         setError('');
 
         try {
-            const token = Cookies.get('session-token');
+            const token = Cookies.get('next-auth.session-token');
             console.log('Token from cookies on submit:', token);
 
             if (!token) {

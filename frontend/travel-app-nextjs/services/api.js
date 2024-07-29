@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 const userApi = axios.create({
     baseURL: 'http://localhost:8001',

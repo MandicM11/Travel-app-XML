@@ -1,64 +1,54 @@
-import { useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { loginUser } from '../services/api';
 
 const Login = () => {
-    const [form, setForm] = useState({
-        email: '',
-        password: '',
-    });
-    const [error, setError] = useState('');
-    const router = useRouter();
+  const { data: session, status } = useSession();
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+  // No need for useState and form state management
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        try {
-            const result = await loginUser(form);
-            console.log('Login result:', result); // Dodaj ovu liniju
+    if (status === 'loading') {
+      return; // Prevent form submission while loading
+    }
 
-            if (result.error) {
-                setError(result.error);
-            } else {
-                console.log('Redirecting to /create'); // Dodaj ovu liniju
-                router.push('/create');
-            }
-        } catch (error) {
-            console.error('Error during login:', error);
-            setError('Failed to login.');
-        }
-    };
+    try {
+      const result = await signIn('credentials', {
+        redirect: false, // Prevent automatic redirection
+        email: e.target.email.value,
+        password: e.target.password.value,
+      });
 
-    return (
-        <div>
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                />
-                <button type="submit">Login</button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </form>
-        </div>
-    );
+      if (result.error) {
+        console.error('Login error:', result.error);
+        // You can display the error message to the user here
+      } else {
+        console.log('Login successful:', result);
+        // Handle successful login (e.g., redirect to create page)
+        router.push('/create');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      // Handle errors appropriately
+    }
+  };
+
+  return (
+    <div>
+      <h1>Login</h1>
+      {status === 'loading' && <p>Loading...</p>}
+      {status === 'unauthenticated' && (
+        <form onSubmit={handleSubmit}>
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Login</button>   
+
+        </form>
+      )}
+      {status === 'authenticated' && <p>Logged in as {session?.user?.email}</p>}
+    </div>
+  );
 };
 
 export default Login;

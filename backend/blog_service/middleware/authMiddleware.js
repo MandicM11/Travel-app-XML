@@ -3,7 +3,7 @@ const SECRET_KEY = '12345'; // Tajni ključ za verifikaciju tokena
 
 const authMiddleware = (req, res, next) => {
     // Uzimanje tokena iz kolačića
-    const token = req.cookies['session-token']; // Provjerite da li je ovo ime u skladu sa imenom u Postmanu
+    const token = req.cookies['next-auth.session-token']; // Provjerite da li je ovo ime u skladu sa imenom u Postmanu
 
     console.log('Token from cookies in authMiddleware:', token); // Logovanje tokena za provere
 
