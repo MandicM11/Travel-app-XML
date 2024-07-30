@@ -1,29 +1,29 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+
+// Kreiraj axios instance za blog i user API
+const blogApi = axios.create({
+    baseURL: 'http://localhost:8000/blog-service',
+    withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
+});
 
 const userApi = axios.create({
-    baseURL: 'http://localhost:8001',
-    withCredentials: true,
+    baseURL: 'http://localhost:8000/user-service',
+    withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
 });
 
-const blogApi = axios.create({
-    baseURL: 'http://localhost:8002',
-    withCredentials: true,
-});
-
+// Interceptor za dodavanje Authorization header-a
 userApi.interceptors.request.use(async (config) => {
     const session = await getSession();
-    console.log('Interceptor - session:', session); // Dodaj log ovde
-    if (session) {
-        console.log('Interceptor - session token:', session.user.token); // Dodaj log ovde
-        config.headers.Authorization = `Bearer ${session.user.token}`;
+    if (session && session.accessToken) {
+        config.headers.Authorization = `Bearer ${session.accessToken}`;
     }
     return config;
 }, (error) => {
     return Promise.reject(error);
 });
 
+// API pozivi za blog
 export const getBlogs = async () => {
     try {
         const response = await blogApi.get('/');
@@ -34,29 +34,9 @@ export const getBlogs = async () => {
     }
 };
 
-export const registerUser = async (userData) => {
-    try {
-        const response = await userApi.post('/register', userData);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-export const loginUser = async (userData) => {
-    try {
-        const response = await userApi.post('/login', userData);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
 export const createBlog = async (blogData) => {
     try {
-        console.log('Sending request with data:', blogData);
         const response = await blogApi.post('/create', blogData);
-        console.log('Response:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error creating blog:', error.response ? error.response.data : error.message);
@@ -69,6 +49,7 @@ export const getComments = async (blogId) => {
         const response = await blogApi.get(`/${blogId}/comments`);
         return response.data;
     } catch (error) {
+        console.error('Error fetching comments:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -78,6 +59,28 @@ export const addComment = async (blogId, content) => {
         const response = await blogApi.post(`/${blogId}/comments`, { content });
         return response.data;
     } catch (error) {
+        console.error('Error adding comment:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+// API pozivi za korisnike
+export const registerUser = async (userData) => {
+    try {
+        const response = await userApi.post('/register', userData);
+        return response.data;
+    } catch (error) {
+        console.error('Error registering user:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const loginUser = async (userData) => {
+    try {
+        const response = await userApi.post('/login', userData);
+        return response.data;
+    } catch (error) {
+        console.error('Error logging in user:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -85,10 +88,9 @@ export const addComment = async (blogId, content) => {
 export const getUsers = async () => {
     try {
         const response = await userApi.get('/users');
-        console.log('Fetched users:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -122,3 +124,5 @@ export const unfollowUser = async (followingId) => {
         throw error;
     }
 };
+
+export { blogApi, userApi };

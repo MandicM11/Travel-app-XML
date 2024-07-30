@@ -1,36 +1,40 @@
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 const Login = () => {
   const { data: session, status } = useSession();
-
-  // No need for useState and form state management
+  const router = useRouter();
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (status === 'loading') {
-      return; // Prevent form submission while loading
+      return;
     }
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
 
     try {
       const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirection
-        email: e.target.email.value,
-        password: e.target.password.value,
+        redirect: false,
+        email,
+        password,
       });
 
       if (result.error) {
+        setError(result.error);
         console.error('Login error:', result.error);
-        // You can display the error message to the user here
       } else {
+        setError(null);
         console.log('Login successful:', result);
-        // Handle successful login (e.g., redirect to create page)
         router.push('/create');
       }
     } catch (error) {
+      setError('An unexpected error occurred. Please try again.');
       console.error('Error during login:', error);
-      // Handle errors appropriately
     }
   };
 
@@ -42,11 +46,11 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <input type="email" name="email" placeholder="Email" required />
           <input type="password" name="password" placeholder="Password" required />
-          <button type="submit">Login</button>   
-
+          <button type="submit">Login</button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       )}
-      {status === 'authenticated' && <p>Logged in as {session?.user?.email}</p>}
+      {status === 'authenticated' && <p>Logged in as {session.user.email}</p>}
     </div>
   );
 };

@@ -6,12 +6,10 @@ import NavigationBar from '../components/Navbar'; // Uvozite navigacioni bar
 function MyApp({ Component, pageProps }) {
   return (
     <SessionProvider session={pageProps.session}>
-      <NavigationBar /> {/* Dodajte navigacioni bar */}
-      <main>
-        <Component {...pageProps} />
-      </main>
+      <NavigationBar /> {/* Dodajte navigacioni bar ovde */}
+      <Component {...pageProps} />
     </SessionProvider>
   );
 }
 
-export default MyApp; 
+export default MyApp;
