@@ -15,7 +15,7 @@ const app = express();
 app.use(cors({
   origin: 'http://localhost:3000', // Frontend adresa
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['*'],
   credentials: true // Omogućava slanje kolačića
 }));
 

@@ -2,13 +2,6 @@ import { useEffect, useState } from 'react';
 import { getBlogs } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import axios from 'axios';
-
-// Postavi `userApi` instancu i koristi je za provjeru statusa praćenja
-const userApi = axios.create({
-    baseURL: 'http://localhost:8000/user-service',
-    withCredentials: true,
-});
 
 const BlogsPage = () => {
     const { data: session, status } = useSession();

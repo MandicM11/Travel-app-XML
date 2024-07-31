@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const followApi = axios.create({
-  baseURL: 'http://localhost:8001', // Podesi osnovni URL za user-service
+  baseURL: 'http://localhost:8000/user-service', // Podesi osnovni URL za user-service
   withCredentials: true,
 });
 

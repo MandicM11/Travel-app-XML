@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
+import Cookies from 'js-cookie'; // Import samo na klijentskoj strani
 
 // Kreiraj axios instance za blog i user API
 const blogApi = axios.create({
@@ -40,13 +41,19 @@ userApi.interceptors.response.use((response) => {
 // API pozivi za blog
 export const getBlogs = async () => {
     try {
+        // Uključi token ako postoji
+        const token = Cookies.get('next-auth.session-token'); // Koristi `js-cookie` za dobavljanje tokena
+        if (token) {
+            blogApi.defaults.headers.Authorization = `Bearer ${token}`;
+        }
+
         const response = await blogApi.get('/');
         return response.data;
     } catch (error) {
-        console.error('Error fetching blogs:', error.response ? error.response.data : error.message);
+        console.error('Error fetching blogs:', error);
         throw error;
     }
-};
+}
 
 export const createBlog = async (blogData) => {
     try {

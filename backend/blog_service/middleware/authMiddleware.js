@@ -3,7 +3,7 @@ const SECRET_KEY = process.env.JWT_SECRET || 'default_secret_key'; // Tajni klju
 
 const authMiddleware = (req, res, next) => {
     // Uzimanje tokena iz kolačića
-    const token = req.cookies['session-token']; // Uveri se da je ovo ime u skladu sa imenom u NextAuth
+    const token = req.cookies['next-auth.session-token']; // Uveri se da je ovo ime u skladu sa imenom u NextAuth
 
     console.log('Token from cookies in authMiddleware:', token); // Logovanje tokena za provere
 

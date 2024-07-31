@@ -58,7 +58,7 @@ router.post('/login', async (req, res) => {
   
       const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
   
-      res.cookie('session-token', token, {
+      res.cookie('next-auth.session-token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

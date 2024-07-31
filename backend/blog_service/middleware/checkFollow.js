@@ -7,7 +7,7 @@ const USER_SERVICE_URL = 'http://api-gateway:8000/user-service';
 const checkFollow = async (req, res, next) => {
     try {
         // Očitavanje tokena iz kolačića
-        const token = req.cookies['session-token']; // Uveri se da je ovo ime u skladu sa imenom u NextAuth
+        const token = req.cookies['next-auth.session-token']; // Uveri se da je ovo ime u skladu sa imenom u NextAuth
 
         console.log('Token from cookies in checkFollow:', token); // Logovanje tokena za provere
 
