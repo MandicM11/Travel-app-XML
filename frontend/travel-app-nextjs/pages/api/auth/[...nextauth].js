@@ -23,7 +23,17 @@ export default NextAuth({
           const user = response.data;
 
           if (user && response.headers['set-cookie']) {
-            return { id: user.id, email: user.email };
+            console.log('Set-Cookie Header:', response.headers['set-cookie'][0]); // Logovanje celog set-cookie headera
+
+            const cookieValue = response.headers['set-cookie'][0];
+            const token = cookieValue.split(';')[0].split('=')[1];
+            console.log('Ovo je splitovani izvuceni Token:', token); // Logovanje izvučenog tokena
+
+            return {
+              id: user.id,
+              email: user.email,
+              accessToken: token, // Preuzmite JWT iz kolačića
+            };
           } else {
             return null;
           }
@@ -48,6 +58,7 @@ export default NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.accessToken = user.accessToken; // Dodajte JWT token u korisnički token
       }
       console.log('JWT Callback Token:', token);
       return token;
@@ -61,15 +72,15 @@ export default NextAuth({
   pages: {
     signIn: '/login',
   },
-  cookies: {
-    sessionToken: {
-      name: 'session-token',
-      options: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      },
-    },
-  },
+  // cookies: {
+  //   sessionToken: {
+  //     name: 'session-token',
+  //     options: {
+  //       httpOnly: true,
+  //       secure: process.env.NODE_ENV === 'production',
+  //       sameSite: 'lax',
+  //       path: '/',
+  //     },
+  //   },
+  // },
 });

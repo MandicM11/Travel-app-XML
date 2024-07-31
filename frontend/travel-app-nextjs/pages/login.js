@@ -18,10 +18,10 @@ export default function Login() {
       });
       
       if (result.ok) {
-        // Redirektuj nakon uspešnog prijavljivanja
         router.push('/');
+        console.log('User signed in successfully');
+        console.log('Sign In Result:', result); // Logovanje rezultata prijave
       } else {
-        // Prikaži grešku ako prijavljivanje nije uspelo
         setError(result.error);
       }
     } catch (error) {

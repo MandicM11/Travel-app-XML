@@ -44,35 +44,33 @@ router.post('/register', async (req, res) => {
 // Prijava korisnika
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).send({ error: 'Invalid credentials' });
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).send({ error: 'Invalid credentials' });
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
-
-        // Set JWT token in cookie
-        res.cookie('session-token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Postavi na true samo u produkciji
-            sameSite: 'lax',
-            maxAge: 3600 * 1000 // 1 sat
-        });
-
-        res.send({ message: 'Login successful' });
-
+      const { email, password } = req.body;
+  
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(401).send({ error: 'Invalid credentials' });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).send({ error: 'Invalid credentials' });
+      }
+  
+      const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
+  
+      res.cookie('session-token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 3600 * 1000
+      });
+  
+      res.send({ message: 'Login successful' });
+  
     } catch (error) {
-        console.error('Error during login:', error);
-        res.status(400).send({ error: error.message });
+      console.error('Error during login:', error);
+      res.status(400).send({ error: error.message });
     }
-});
+  });
 
 module.exports = router;
