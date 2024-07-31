@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getBlogs, setAuthToken } from '../services/api';
+import { getBlogs } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+
+// Postavi `userApi` instancu i koristi je za provjeru statusa praćenja
+const userApi = axios.create({
+    baseURL: 'http://localhost:8000/user-service',
+    withCredentials: true,
+});
 
 const BlogsPage = () => {
     const { data: session, status } = useSession();
@@ -13,11 +20,7 @@ const BlogsPage = () => {
         const fetchBlogs = async () => {
             try {
                 if (status === 'loading') return;
-                const token = session?.user?.token;
-                if (token) {
-                    setAuthToken(token); // Postavi token pre poziva
-                }
-                const data = await getBlogs();
+                const data = await getBlogs(); // Koristi `getBlogs` iz `blogApi`
                 setBlogs(data);
             } catch (error) {
                 console.error('Error fetching blogs:', error);
@@ -27,25 +30,22 @@ const BlogsPage = () => {
         };
 
         fetchBlogs();
-    }, [session, status]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    }, [status]);
 
     const handleComment = async (blog) => {
-        const token = session?.user?.token;
-        if (token) {
-            setAuthToken(token); // Postavi token pre poziva
+        if (!session) {
+            alert('You need to be logged in to comment.');
+            return;
         }
 
         try {
-            const response = await axios.get(`http://localhost:8000/user-service/following/${blog.author}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const token = session?.accessToken;
+            if (token) {
+                userApi.defaults.headers.Authorization = `Bearer ${token}`; // Postavi token za `userApi` zahteve
+            }
 
+            // Proveri da li pratiš autora bloga
+            const response = await userApi.get(`/follow-status/${blog.author}`);
             if (response.data.isFollowing) {
                 router.push(`/blogs/${blog._id}/comments`);
             } else {
@@ -55,6 +55,10 @@ const BlogsPage = () => {
             console.error('Error checking follow status:', error);
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
@@ -67,7 +71,7 @@ const BlogsPage = () => {
                     </li>
                 ))}
             </ul>
-        </div>  
+        </div>
     );
 };
 

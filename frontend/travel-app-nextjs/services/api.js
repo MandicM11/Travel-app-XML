@@ -12,26 +12,31 @@ const userApi = axios.create({
     withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
 });
 
+// Interceptor za `userApi` koji dodaje JWT token u zaglavlje zahteva
 userApi.interceptors.request.use(async (config) => {
-    const session = await getSession();
-    if (session && session.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    try {
+        const session = await getSession();
+        if (session && session.accessToken) {
+            config.headers.Authorization = `Bearer ${session.accessToken}`;
+        }
+    } catch (error) {
+        console.error('Error fetching session:', error);
     }
     console.log('Request Config:', config);
     return config;
-  }, (error) => {
+}, (error) => {
     console.error('Request Error:', error);
     return Promise.reject(error);
-  });
-  
-  userApi.interceptors.response.use((response) => {
+});
+
+userApi.interceptors.response.use((response) => {
     console.log('Response Data:', response.data);
     return response;
-  }, (error) => {
+}, (error) => {
     console.error('Response Error:', error);
     return Promise.reject(error);
-  });
-  
+});
+
 // API pozivi za blog
 export const getBlogs = async () => {
     try {
