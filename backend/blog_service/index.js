@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const blogRoutes = require('./routes/blogRoutes');
@@ -5,6 +6,8 @@ const authMiddleware = require('./middleware/authMiddleware');
 const commentRoutes = require('./routes/comments');
 const cors = require('cors');
 const cookieParser = require('cookie-parser'); // Dodajte cookie-parser
+
+
 
 const app = express();
 

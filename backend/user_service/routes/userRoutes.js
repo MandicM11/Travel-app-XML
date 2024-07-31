@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const SECRET_KEY = '12345';
+const SECRET_KEY = process.env.JWT_SECRET; // Koristite varijablu okruženja za tajni ključ
 
 // Ruta za dobavljanje svih korisnika
 router.get('/users', async (req, res) => {
@@ -57,8 +57,17 @@ router.post('/login', async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
-        res.send({ token }); // Send JWT token to frontend
+        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
+
+        // Set JWT token in cookie
+        res.cookie('session-token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Postavi na true samo u produkciji
+            sameSite: 'lax',
+            maxAge: 3600 * 1000 // 1 sat
+        });
+
+        res.send({ message: 'Login successful' });
 
     } catch (error) {
         console.error('Error during login:', error);

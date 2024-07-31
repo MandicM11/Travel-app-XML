@@ -2,6 +2,9 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import axios from 'axios';
 
+const jwtSecret = process.env.NEXT_PUBLIC_JWT_SECRET;
+console.log('NextAuth JWT Secret:', jwtSecret);
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
@@ -12,15 +15,15 @@ export default NextAuth({
       },
       authorize: async (credentials) => {
         try {
-          const response = await axios.post('http://localhost:8000/user-service', {
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user-service/login`, {
             email: credentials.email,
             password: credentials.password,
-          });
+          }, { withCredentials: true });
 
           const user = response.data;
 
-          if (user && user.token) {
-            return { id: user.id, email: user.email, accessToken: user.token }; // Pretpostavljamo da 'token' sadrži JWT
+          if (user && response.headers['set-cookie']) {
+            return { id: user.id, email: user.email };
           } else {
             return null;
           }
@@ -32,28 +35,41 @@ export default NextAuth({
     }),
   ],
   session: {
-    jwt: true,
+    strategy: 'jwt',
   },
   jwt: {
-    secret: '12345', // Koristi varijablu okruženja
+    secret: jwtSecret,
     signingOptions: {
       algorithm: 'HS256',
     },
   },
   callbacks: {
-    async jwt(token, user) {
+    jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.accessToken = user.accessToken;
       }
+      console.log('JWT Callback Token:', token);
       return token;
     },
-    async session(session, token) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.accessToken = token.accessToken;
+    session: async ({ session, token }) => {
+      session.user = token;
+      console.log('Session Callback:', session);
       return session;
+    },
+  },
+  pages: {
+    signIn: '/login',
+  },
+  cookies: {
+    sessionToken: {
+      name: 'session-token',
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      },
     },
   },
 });

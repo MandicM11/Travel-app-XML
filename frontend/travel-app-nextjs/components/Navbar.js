@@ -5,11 +5,13 @@ import TestSession from './TestSession';
 
 const NavigationBar = () => {
   const { data: session, status } = useSession();
-  console.log('NavigationBar - session:', session); // Dodaj log ovde
-  console.log('NavigationBar - status:', status); // Dodaj log ovde
+
+  // Dodaj logove za debugovanje
+  console.log('NavigationBar - session:', session);
+  console.log('NavigationBar - status:', status);
 
   const handleLogout = async () => {
-    await signOut();
+    await signOut({ redirect: false }); // Ne preusmerava nakon odjave
   };
 
   return (
@@ -30,7 +32,7 @@ const NavigationBar = () => {
               <Nav.Link as={Link} href="/blogs" passHref>Blogs</Nav.Link>
               <Nav.Link as={Link} href="/profile" passHref>Profile</Nav.Link>
               <Nav.Link as={Link} href="/follow" passHref>Follow Users</Nav.Link>
-              <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+              <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</Nav.Link>
             </>
           )}
         </Nav>

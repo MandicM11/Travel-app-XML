@@ -1,58 +1,57 @@
-import { useSession, signIn } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
-const Login = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (status === 'loading') {
-      return;
-    }
-
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-
     try {
       const result = await signIn('credentials', {
         redirect: false,
         email,
         password,
       });
-
-      if (result.error) {
-        setError(result.error);
-        console.error('Login error:', result.error);
+      
+      if (result.ok) {
+        // Redirektuj nakon uspešnog prijavljivanja
+        router.push('/');
       } else {
-        setError(null);
-        console.log('Login successful:', result);
-        router.push('/create');
+        // Prikaži grešku ako prijavljivanje nije uspelo
+        setError(result.error);
       }
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Error during login:', error);
+      console.error('Login failed:', error);
+      setError('An error occurred. Please try again.');
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      {status === 'loading' && <p>Loading...</p>}
-      {status === 'unauthenticated' && (
-        <form onSubmit={handleSubmit}>
-          <input type="email" name="email" placeholder="Email" required />
-          <input type="password" name="password" placeholder="Password" required />
-          <button type="submit">Login</button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-        </form>
-      )}
-      {status === 'authenticated' && <p>Logged in as {session.user.email}</p>}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Password:
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Login</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </form>
   );
-};
-
-export default Login;
+}

@@ -18,6 +18,8 @@ services:
       - mongo
     networks:
       - backend-network
+    env_file:
+      - .env
 
   blog-service:
     build: './blog_service'
@@ -27,6 +29,8 @@ services:
       - mongo
     networks:
       - backend-network
+    env_file:
+      - .env
 
   tour-service:
     build: './tour_service'
@@ -36,6 +40,8 @@ services:
       - mongo
     networks:
       - backend-network
+    env_file:
+      - .env
 
   api-gateway:
     build: './api_gateway'
@@ -47,6 +53,8 @@ services:
       - tour-service
     networks:
       - backend-network
+    env_file:
+      - .env
 
 volumes:
   mongo-data:

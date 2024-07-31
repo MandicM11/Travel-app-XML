@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = '12345'; // Tajni ključ za verifikaciju tokena
+const SECRET_KEY = process.env.JWT_SECRET || 'default_secret_key'; // Tajni ključ za verifikaciju tokena
 
 const authMiddleware = (req, res, next) => {
     // Uzimanje tokena iz kolačića
-    const token = req.cookies['next-auth.session-token']; // Provjerite da li je ovo ime u skladu sa imenom u Postmanu
+    const token = req.cookies['session-token']; // Uveri se da je ovo ime u skladu sa imenom u NextAuth
 
     console.log('Token from cookies in authMiddleware:', token); // Logovanje tokena za provere
 
