@@ -1,28 +1,24 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = process.env.JWT_SECRET;
-
-console.log('Backend JWT Secret:', SECRET_KEY);
+const SECRET_KEY = process.env.JWT_SECRET || 'default_secret_key'; // Tajni ključ za verifikaciju tokena
 
 const authMiddleware = (req, res, next) => {
-  try {
-    const token = req.cookies['session-token'] || req.headers['authorization']?.split(' ')[1];
-    console.log('Backend Token:', token);
+    // Uzimanje tokena iz Authorization header-a
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    console.log('Token from header in authMiddleware:', token); // Logovanje tokena za provere
 
     if (!token) {
-      return res.status(401).send({ error: 'No token provided' });
+        return res.status(401).send({ error: 'No token provided' });
     }
 
-    jwt.verify(token, SECRET_KEY, { algorithms: ['HS256'] }, (err, user) => {
-      if (err) {
-        return res.status(403).send({ error: 'Invalid token' });
-      }
-
-      req.user = user;
-      next();
-    });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        res.status(401).send({ error: 'Invalid token' });
+    }
 };
 
 module.exports = authMiddleware;

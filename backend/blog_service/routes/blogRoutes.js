@@ -7,7 +7,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Ruta za dohvat svih blogova
-router.get('/', async (req, res) => {
+router.get('/blogs', async (req, res) => {
   try {
     const blogs = await Blog.find();
     res.status(200).json(blogs);

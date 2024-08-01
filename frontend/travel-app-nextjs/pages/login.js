@@ -1,4 +1,4 @@
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -7,6 +7,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const router = useRouter();
+  const { status } = useSession(); // Za praćenje sesije
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,9 +19,10 @@ export default function Login() {
       });
       
       if (result.ok) {
+        // Token će biti automatski postavljen u kolačić kada se koristi `next-auth`
         router.push('/');
         console.log('User signed in successfully');
-        console.log('Sign In Result:', result); // Logovanje rezultata prijave
+        console.log('Sign In Result:', result);
       } else {
         setError(result.error);
       }

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import Cookies from 'js-cookie'; // Import samo na klijentskoj strani
 
 // Kreiraj axios instance za blog i user API
 const blogApi = axios.create({
@@ -17,8 +16,8 @@ const userApi = axios.create({
 userApi.interceptors.request.use(async (config) => {
     try {
         const session = await getSession();
-        if (session && session.accessToken) {
-            config.headers.Authorization = `Bearer ${session.accessToken}`;
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
         }
     } catch (error) {
         console.error('Error fetching session:', error);
@@ -30,24 +29,26 @@ userApi.interceptors.request.use(async (config) => {
     return Promise.reject(error);
 });
 
-userApi.interceptors.response.use((response) => {
-    console.log('Response Data:', response.data);
-    return response;
+// Interceptor za `blogApi` koji dodaje JWT token u zaglavlje zahteva
+blogApi.interceptors.request.use(async (config) => {
+    try {
+        const session = await getSession();
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
+            console.log('Axios interceptor - token:', session.user.accessToken); // Logovanje tokena za provere
+        }
+    } catch (error) {
+        console.error('Error fetching session:', error);
+    }
+    return config;
 }, (error) => {
-    console.error('Response Error:', error);
     return Promise.reject(error);
 });
 
 // API pozivi za blog
 export const getBlogs = async () => {
     try {
-        // Uključi token ako postoji
-        const token = Cookies.get('next-auth.session-token'); // Koristi `js-cookie` za dobavljanje tokena
-        if (token) {
-            blogApi.defaults.headers.Authorization = `Bearer ${token}`;
-        }
-
-        const response = await blogApi.get('/');
+        const response = await blogApi.get('/blogs');
         return response.data;
     } catch (error) {
         console.error('Error fetching blogs:', error);
