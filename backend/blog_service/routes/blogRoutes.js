@@ -42,7 +42,7 @@ router.get('/:id', async (req, res) => {
 // Ruta za kreiranje novog bloga
 router.post('/create', authMiddleware, async (req, res) => {
   const { title, description, creationDate, images, status } = req.body;
-
+  console.log('user iz ruta je', req.user);
   try {
     // Validacija podataka
     if (!title || !description || !creationDate || !status) {
@@ -67,7 +67,7 @@ router.post('/create', authMiddleware, async (req, res) => {
       creationDate,
       images: imagePaths, 
       status,
-      author: req.user._id 
+      author: req.user.userId 
     });
 
     await blog.save();

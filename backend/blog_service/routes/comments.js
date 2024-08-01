@@ -12,8 +12,8 @@ router.post('/:id/comments', authMiddleware, checkFollow, async (req, res) => {
 
     try {
         const { content } = req.body;
-        const userId = req.user._id;
-        const blogId = req.params.id;
+        const userId = req.user.userId;
+        const blogId = req.params.blogId;
 
         console.log(`Processing comment for blogId: ${blogId}`);
         const blog = await Blog.findById(blogId);

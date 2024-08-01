@@ -19,8 +19,8 @@ const checkFollow = async (req, res, next) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         req.user = decoded; // Dodeljujemo korisnika za dalje korišćenje
 
-        const userId = req.user.id;
-        const blogId = req.params.id;
+        const userId = req.user.userId;
+        const blogId = req.params.blogId;
 
         console.log(`Checking follow for userId: ${userId} and blogId: ${blogId}`);
 

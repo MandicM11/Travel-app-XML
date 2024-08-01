@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/follow', authMiddleware, async (req, res) => {
     try {
         const { followingId } = req.body;
-        const followerId = req.user._id;
+        const followerId = req.user.userId;
 
         console.log('Follower ID:', followerId);
         console.log('Following ID:', followingId);
@@ -38,7 +38,7 @@ router.post('/follow', authMiddleware, async (req, res) => {
 router.delete('/unfollow/:followingId', authMiddleware, async (req, res) => {
     try {
         const { followingId } = req.params;
-        const followerId = req.user._id;
+        const followerId = req.user.userId;
 
         if (!followingId) {
             return res.status(400).json({ error: 'followingId is required' });
@@ -64,7 +64,7 @@ router.delete('/unfollow/:followingId', authMiddleware, async (req, res) => {
 router.get('/follow-status/:followingId', authMiddleware, async (req, res) => {
     try {
         const { followingId } = req.params;
-        const followerId = req.user._id;
+        const followerId = req.user.userId;
 
         console.log('Follower ID:', followerId);
         console.log('Following ID:', followingId);
