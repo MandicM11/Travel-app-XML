@@ -1,51 +1,32 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
-import CommentForm from '../../components/CommentForm';
-import { Container, ListGroup, Spinner } from 'react-bootstrap'; // Uvezi Bootstrap komponente
 
-const CommentsPage = () => {
-  const router = useRouter();
-  const { blogId } = router.query;
-  const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default async function handler(req, res) {
+  const { method } = req;
+  const { blogId } = req.query;
 
-  useEffect(() => {
-    if (blogId) {
-      fetchComments();
-    }
-  }, [blogId]);
+  const apiUrl = `http://localhost:8000/blog-service/${blogId}/comments`; // URL ka vašem blog mikroservisu
 
-  const fetchComments = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8000/blog-service/${blogId}/comments`);
-      setComments(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Container className="text-center">
-        <Spinner animation="border" />
-      </Container>
-    );
+  switch (method) {
+    case 'GET':
+      try {
+        const response = await axios.get(apiUrl);
+        res.status(200).json(response.data);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ message: 'Error fetching comments' });
+      }
+      break;
+    case 'POST':
+      try {
+        const response = await axios.post(apiUrl, req.body);
+        res.status(201).json(response.data);
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ message: 'Error adding comment' });
+      }
+      break;
+    default:
+      res.setHeader('Allow', ['GET', 'POST']);
+      res.status(405).end(`Method ${method} Not Allowed`);
   }
-
-  return (
-    <Container>
-      <h1>Comments for Blog {blogId}</h1>
-      <ListGroup>
-        {comments.map(comment => (
-          <ListGroup.Item key={comment._id}>{comment.content}</ListGroup.Item>
-        ))}
-      </ListGroup>
-      <CommentForm blogId={blogId} />
-    </Container>
-  );
-};
-
-export default CommentsPage;
+}

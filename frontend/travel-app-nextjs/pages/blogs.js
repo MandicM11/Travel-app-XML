@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { getBlogs } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { userApi, getFollowStatus } from '../services/api'; // Dodaj import userApi i getFollowStatus
+
 
 const BlogsPage = () => {
     const { data: session, status } = useSession();
