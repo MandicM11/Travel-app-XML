@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { createBlog } from '../services/api';
+import { createBlog, userApi } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Form, Button } from 'react-bootstrap';
-import Cookies from 'js-cookie';
 
 const CreateBlog = () => {
     const { data: session, status } = useSession();
@@ -20,18 +19,10 @@ const CreateBlog = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const token = Cookies.get('next-auth.session-token');
-        console.log('Token from cookies on load:', token);
-
-        if (!session && !token) {
-            console.log('No session found, redirecting to /login');
+        if (status === 'unauthenticated') {
             router.push('/login');
         }
-    }, [session, router]);
-
-    if (status === 'loading') {
-        return <p>Loading...</p>;
-    }
+    }, [status, router]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -60,13 +51,15 @@ const CreateBlog = () => {
         setError('');
 
         try {
-            const token = Cookies.get('next-auth.session-token');
-            console.log('Token from cookies on submit:', token);
+            const token = session?.user?.accessToken;
+            console.log('Session token:', token);
 
             if (!token) {
                 setError('You must be logged in to create a blog.');
                 throw new Error('No session token found');
             }
+
+            userApi.defaults.headers.Authorization = `Bearer ${token}`;
 
             const response = await createBlog(formData);
             console.log('Blog created:', response);
@@ -76,6 +69,10 @@ const CreateBlog = () => {
             setError('Failed to create blog. Please try again.');
         }
     };
+
+    if (status === 'loading') {
+        return <p>Loading...</p>;
+    }
 
     return (
         <Form onSubmit={handleSubmit}>
