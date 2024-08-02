@@ -20,7 +20,7 @@ const checkFollow = async (req, res, next) => {
         req.user = decoded; // Dodeljujemo korisnika za dalje korišćenje
 
         const userId = req.user.userId;
-        const blogId = req.params.blogId;
+        const blogId = req.params.id;
 
         console.log(`Checking follow for userId: ${userId} and blogId: ${blogId}`);
 
