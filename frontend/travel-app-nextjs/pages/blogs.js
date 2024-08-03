@@ -1,4 +1,3 @@
-// pages/blogs.js
 import { useEffect, useState } from 'react';
 import { getBlogs } from '../services/api';
 import { useSession } from 'next-auth/react';
@@ -34,7 +33,7 @@ const BlogsPage = () => {
     }
 
     try {
-      const token = session?.accessToken;
+      const token = session?.user?.accessToken;
       if (token) {
         userApi.defaults.headers.Authorization = `Bearer ${token}`;
       }

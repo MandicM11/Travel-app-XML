@@ -13,7 +13,7 @@ const app = express();
 
 // CORS konfiguracija
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend adresa
+  origin: ['http://localhost:3000', 'http://user-service:8001', 'http://blog-service:8002', 'http://tour-service:8003'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // Omogućava slanje kolačića
