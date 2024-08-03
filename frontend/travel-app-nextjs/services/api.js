@@ -78,13 +78,13 @@ export const getComments = async (blogId) => {
 
 export const addComment = async (blogId, content) => {
     try {
-        const response = await blogApi.post(`/${blogId}/comments`, { content });
-        return response.data;
+      const response = await blogApi.post(`/${blogId}/comments`, { content });
+      return response.data;
     } catch (error) {
-        console.error('Error adding comment:', error.response ? error.response.data : error.message);
-        throw error;
+      console.error('Error adding comment:', error.response ? error.response.data : error.message);
+      throw error;
     }
-};
+  };
 
 // API pozivi za korisnike
 export const registerUser = async (userData) => {
