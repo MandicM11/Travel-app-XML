@@ -1,27 +1,38 @@
-// user_service/index.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const keyPointRoutes = require('./routes/KeyPointRoutes');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const authMiddleware = require('./middleware/authMiddleware');
+
 const app = express();
 
-// Middleware za parsiranje JSON-a
-app.use(express.json());
+// Middleware
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://user-service:8001', 'http://blog-service:8002', 'http://tour-service:8003'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true // Omogućava slanje kolačića
+}));
+app.use(express.json({ limit: '50mb' })); // Povećavamo limit za JSON payload
+app.use(cookieParser()); // Dodajemo middleware za kolačiće
 
-// Povezivanje sa MongoDB
-mongoose.connect('mongodb://mongo:27017/touristDB', {
+// MongoDB konekcija
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
-
-mongoose.connection.once('open', () => {
+}).then(() => {
     console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('Failed to connect to MongoDB', err);
 });
 
-// Osnovna ruta
-app.get('/', (req, res) => {
-    res.send('Tour Service');
-});
+// Koristi rute
+app.use(authMiddleware, keyPointRoutes); // Autentifikacija za /keypoints rute
 
 const PORT = process.env.PORT || 8003;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Tour service is running on port ${PORT}`);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
 });
