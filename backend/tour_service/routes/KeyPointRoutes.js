@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const KeyPoint = require('../models/KeyPoint');
+const authMiddleware = require('../middleware/authMiddleware'); // Importovanje authMiddleware-a
 
 const router = express.Router();
 
@@ -11,9 +12,13 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-router.post('/create-keypoint', async (req, res) => {
+// Ruta za kreiranje ključne tačke
+router.post('/create-keypoint', authMiddleware, async (req, res) => {
     try {
         const { name, description, latitude, longitude, image } = req.body;
+        const author = req.user.userId;
+
+        console.log('Author ID:', author);
 
         let imagePath = null;
         if (image && image !== '') {
@@ -28,7 +33,8 @@ router.post('/create-keypoint', async (req, res) => {
             description,
             latitude,
             longitude,
-            image: imagePath
+            image: imagePath,
+            author // Dodavanje author polja
         });
 
         await newKeyPoint.save();
@@ -40,7 +46,7 @@ router.post('/create-keypoint', async (req, res) => {
 });
 
 // Dohvati sve ključne tačke
-router.get('/keypoint/all', async (req, res) => {
+router.get('/keypoints', async (req, res) => {
     try {
         const keyPoints = await KeyPoint.find();
         res.status(200).json(keyPoints);
@@ -50,9 +56,9 @@ router.get('/keypoint/all', async (req, res) => {
 });
 
 // Dohvati ključnu tačku po ID-ju
-router.get('/keypoint/:keyPointId', async (req, res) => {
+router.get('/keypoint/:keypointId', async (req, res) => {
     try {
-        const keyPoint = await KeyPoint.findById(req.params.id);
+        const keyPoint = await KeyPoint.findById(req.params.keypointId); // ispravljeno req.params.keypointId
         if (!keyPoint) {
             return res.status(404).json({ message: 'KeyPoint not found' });
         }

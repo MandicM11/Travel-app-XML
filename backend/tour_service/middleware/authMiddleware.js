@@ -15,10 +15,11 @@ const authMiddleware = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
         req.user = decoded;
+        console.log('role je: ', req.user.role)
 
         // Proveravamo da li korisnik ima ulogu Author
         if (req.user.role !== 'author') {
-            console.log('role je: ', req.user.role)
+            
             return res.status(403).send({ error: 'Forbidden: You do not have the required role' });
         }
 

@@ -6,12 +6,18 @@ import TestSession from './TestSession';
 const NavigationBar = () => {
   const { data: session, status } = useSession();
 
-  // Dodaj logove za debugovanje
   console.log('NavigationBar - session:', session);
   console.log('NavigationBar - status:', status);
 
   const handleLogout = async () => {
-    await signOut({ redirect: false }); // Ne preusmerava nakon odjave
+    try {
+      await signOut({ redirect: false });
+      // Ako želiš da preusmeriš korisnika nakon odjave, možeš koristiti router.push
+      // const router = useRouter();
+      // router.push('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
@@ -20,19 +26,21 @@ const NavigationBar = () => {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link as={Link} href="/" passHref>Home</Nav.Link>
+          <Nav.Link as={Link} href="/" passHref key="home">Home</Nav.Link>
           {!session ? (
             <>
-              <Nav.Link as={Link} href="/register" passHref>Register</Nav.Link>
-              <Nav.Link as={Link} href="/login" passHref>Login</Nav.Link>
+              <Nav.Link as={Link} href="/register" passHref key="register">Register</Nav.Link>
+              <Nav.Link as={Link} href="/login" passHref key="login">Login</Nav.Link>
             </>
           ) : (
             <>
-              <Nav.Link as={Link} href="/create" passHref>Create Blog</Nav.Link>
-              <Nav.Link as={Link} href="/blogs" passHref>Blogs</Nav.Link>
-              <Nav.Link as={Link} href="/profile" passHref>Profile</Nav.Link>
-              <Nav.Link as={Link} href="/follow" passHref>Follow Users</Nav.Link>
-              <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</Nav.Link>
+              <Nav.Link as={Link} href="/create" passHref key="create-blog">Create Blog</Nav.Link>
+              <Nav.Link as={Link} href="/blogs" passHref key="blogs">Blogs</Nav.Link>
+              <Nav.Link as={Link} href="/profile" passHref key="profile">Profile</Nav.Link>
+              <Nav.Link as={Link} href="/follow" passHref key="follow">Follow Users</Nav.Link>
+              <Nav.Link as={Link} href="/create-keypoint" passHref key="create-keypoint">Create Key Point</Nav.Link>
+              <Nav.Link as={Link} href="/keypoints" passHref key="keypoints">Key Points</Nav.Link>
+              <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }} key="logout">Logout</Nav.Link>
             </>
           )}
         </Nav>

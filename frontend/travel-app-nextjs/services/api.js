@@ -170,7 +170,7 @@ export const unfollowUser = async (followingId) => {
 // API pozivi za key points i ture
 export const createKeyPoint = async (keyPointData) => {
     try {
-        const response = await tourApi.post('/create-point', keyPointData);
+        const response = await tourApi.post('/create-keypoint', keyPointData);
         return response.data;
     } catch (error) {
         console.error('Error creating key point:', error.response ? error.response.data : error.message);
@@ -180,7 +180,7 @@ export const createKeyPoint = async (keyPointData) => {
 
 export const getKeyPoints = async () => {
     try {
-        const response = await tourApi.get('/all');
+        const response = await tourApi.get('/keypoints');
         return response.data;
     } catch (error) {
         console.error('Error fetching key points:', error.response ? error.response.data : error.message);
@@ -190,7 +190,7 @@ export const getKeyPoints = async () => {
 
 export const getKeyPointById = async (id) => {
     try {
-        const response = await tourApi.get(`/${id}`);
+        const response = await tourApi.get(`/keypoint/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching key point by ID:', error.response ? error.response.data : error.message);
