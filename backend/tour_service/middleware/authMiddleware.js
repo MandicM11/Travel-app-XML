@@ -17,7 +17,8 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded;
 
         // Proveravamo da li korisnik ima ulogu Author
-        if (req.user.role !== 'Author') {
+        if (req.user.role !== 'author') {
+            console.log('role je: ', req.user.role)
             return res.status(403).send({ error: 'Forbidden: You do not have the required role' });
         }
 

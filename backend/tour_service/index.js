@@ -5,6 +5,8 @@ const keyPointRoutes = require('./routes/KeyPointRoutes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./middleware/authMiddleware');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -18,8 +20,13 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' })); // Povećavamo limit za JSON payload
 app.use(cookieParser()); // Dodajemo middleware za kolačiće
 
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
 // MongoDB konekcija
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect('mongodb://mongo:27017/touristDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {

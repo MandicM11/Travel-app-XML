@@ -5,14 +5,23 @@ const KeyPoint = require('../models/KeyPoint');
 
 const router = express.Router();
 
+// Kreiraj uploads direktorijum ako ne postoji
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 router.post('/create-point', async (req, res) => {
     try {
         const { name, description, latitude, longitude, image } = req.body;
 
-        // Obrada base64 slike
-        const buffer = Buffer.from(image, 'base64');
-        const imagePath = path.join(__dirname, '../uploads', `image${Date.now()}.jpg`);
-        fs.writeFileSync(imagePath, buffer);
+        let imagePath = null;
+        if (image && image !== '') {
+            // Obrada base64 slike
+            const buffer = Buffer.from(image, 'base64');
+            imagePath = path.join(uploadsDir, `image${Date.now()}.jpg`);
+            fs.writeFileSync(imagePath, buffer);
+        }
 
         const newKeyPoint = new KeyPoint({
             name,
@@ -25,14 +34,13 @@ router.post('/create-point', async (req, res) => {
         await newKeyPoint.save();
         res.status(201).json(newKeyPoint);
     } catch (error) {
+        console.error('Error during create-point:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
-// Dodavanje GET ruta
-
-// Get all key points
-router.get('/', async (req, res) => {
+// Dohvati sve ključne tačke
+router.get('/all', async (req, res) => {
     try {
         const keyPoints = await KeyPoint.find();
         res.status(200).json(keyPoints);
@@ -41,13 +49,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get key point by ID
+// Dohvati ključnu tačku po ID-ju
 router.get('/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const keyPoint = await KeyPoint.findById(id);
+        const keyPoint = await KeyPoint.findById(req.params.id);
         if (!keyPoint) {
-            return res.status(404).json({ message: 'Key point not found' });
+            return res.status(404).json({ message: 'KeyPoint not found' });
         }
         res.status(200).json(keyPoint);
     } catch (error) {

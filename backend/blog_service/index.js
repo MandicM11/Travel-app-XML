@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 const blogRoutes = require('./routes/blogRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 const commentRoutes = require('./routes/comments');
+const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
 const cookieParser = require('cookie-parser'); // Dodajte cookie-parser
 
 
@@ -21,6 +23,11 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser()); // Dodajte cookie-parser middleware
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
 
 // Povezivanje sa MongoDB
 mongoose.connect('mongodb://mongo:27017/touristDB', {

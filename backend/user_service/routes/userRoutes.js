@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
         return res.status(401).send({ error: 'Invalid credentials' });
       }
   
-      const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
+      const token = jwt.sign({ userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h', algorithm: 'HS256' });
   
       res.cookie('next-auth.session-token', token, {
         httpOnly: true,
