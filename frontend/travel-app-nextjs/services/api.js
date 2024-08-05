@@ -12,6 +12,26 @@ const userApi = axios.create({
     withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
 });
 
+const tourApi = axios.create({
+    baseURL: 'http://localhost:8000/tour-service',
+    withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
+});
+
+tourApi.interceptors.request.use(async (config) => {
+    try {
+        const session = await getSession();
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
+        }
+    } catch (error) {
+        console.error('Error fetching session:', error);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+
 // Interceptor za `userApi` koji dodaje JWT token u zaglavlje zahteva
 userApi.interceptors.request.use(async (config) => {
     try {
@@ -147,4 +167,37 @@ export const unfollowUser = async (followingId) => {
     }
 };
 
-export { blogApi, userApi };
+// API pozivi za key points i ture
+export const createKeyPoint = async (keyPointData) => {
+    try {
+        const response = await tourApi.post('/create-point', keyPointData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating key point:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const getKeyPoints = async () => {
+    try {
+        const response = await tourApi.get('/all');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching key points:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const getKeyPointById = async (id) => {
+    try {
+        const response = await tourApi.get(`/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching key point by ID:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+// Možeš dodati i druge funkcije za tour API ovde kada bude potrebno
+
+export { blogApi, userApi, tourApi };

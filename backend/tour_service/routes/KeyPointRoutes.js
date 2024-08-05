@@ -11,7 +11,7 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-router.post('/create-point', async (req, res) => {
+router.post('/create-keypoint', async (req, res) => {
     try {
         const { name, description, latitude, longitude, image } = req.body;
 
@@ -40,7 +40,7 @@ router.post('/create-point', async (req, res) => {
 });
 
 // Dohvati sve ključne tačke
-router.get('/all', async (req, res) => {
+router.get('/keypoint/all', async (req, res) => {
     try {
         const keyPoints = await KeyPoint.find();
         res.status(200).json(keyPoints);
@@ -50,7 +50,7 @@ router.get('/all', async (req, res) => {
 });
 
 // Dohvati ključnu tačku po ID-ju
-router.get('/:id', async (req, res) => {
+router.get('/keypoint/:keyPointId', async (req, res) => {
     try {
         const keyPoint = await KeyPoint.findById(req.params.id);
         if (!keyPoint) {
