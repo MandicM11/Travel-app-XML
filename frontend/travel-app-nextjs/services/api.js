@@ -197,6 +197,15 @@ export const getKeyPointById = async (id) => {
         throw error;
     }
 };
+export const saveLocation = async (locationData) => {
+    try {
+      const response = await axios.post('/save-location', locationData);
+      return response.data;
+    } catch (error) {
+      console.error('Error saving location:', error.response ? error.response.data : error.message);
+      throw error;
+    }
+  };
 
 // Možeš dodati i druge funkcije za tour API ovde kada bude potrebno
 
