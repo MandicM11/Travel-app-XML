@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const keyPointRoutes = require('./routes/KeyPointRoutes');
+const tourRoutes = require('./routes/tourRoutes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./middleware/authMiddleware');
@@ -37,6 +38,7 @@ mongoose.connect('mongodb://mongo:27017/touristDB', {
 
 // Koristi rute
 app.use(authMiddleware, keyPointRoutes); // Autentifikacija za /keypoints rute
+app.use(authMiddleware, tourRoutes);
 
 const PORT = process.env.PORT || 8003;
 app.listen(PORT, () => {
