@@ -5,7 +5,7 @@ const KeyPoint = require('../models/KeyPoint');
 const authMiddleware = require('../middleware/authMiddleware'); // Importovanje authMiddleware-a
 
 // Dohvat jedne ture po ID-u
-router.get('/:tourId', async (req, res) => {
+router.get('/tour/:tourId', async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.tourId).populate('keyPoints');
     if (!tour) {
@@ -17,11 +17,14 @@ router.get('/:tourId', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
-  console.log('GET /tours route hit');
+// Dohvat svih tura
+router.get('/tour', async (req, res) => {
+  console.log('GET /tour route hit');
   try {
-    const tours = await Tour.find().populate( {path: 'keyPoints',
-      select: 'name'}); 
+    const tours = await Tour.find().populate({
+      path: 'keyPoints',
+      select: 'name'
+    });
     console.log('Tours:', tours);
     res.status(200).json(tours);
   } catch (error) {
@@ -30,7 +33,7 @@ router.get('/', async (req, res) => {
 });
 
 // Kreiranje ture u stanju "draft"
-router.post('/create-tour', authMiddleware, async (req, res) => {
+router.post('/tour/create-tour', authMiddleware, async (req, res) => {
   try {
     const { name, description, difficulty, tags } = req.body;
     const author = req.user.userId; // ID korisnika koji kreira turu
@@ -50,16 +53,15 @@ router.post('/create-tour', authMiddleware, async (req, res) => {
   }
 });
 
-
 // Dodavanje ključne tačke
-router.post('/:tourId/keypoint', authMiddleware, async (req, res) => {
+router.post('/tour/:tourId/keypoint', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
     const { keyPointId } = req.body;
     const tour = await Tour.findById(tourId);
     console.log('Tour ID:', tourId); // Logovanje tourId
     console.log('KeyPoint ID:', keyPointId); // Logovanje keyPointId
-    console.log('tura je: ',tour);
+    console.log('Tura je:', tour);
     if (!tour) {
       return res.status(404).json({ error: 'Tour not found' });
     }
@@ -70,7 +72,7 @@ router.post('/:tourId/keypoint', authMiddleware, async (req, res) => {
     }
 
     const keyPoint = await KeyPoint.findById(keyPointId);
-    console.log('ovo je ta kljucna tacka: ', keyPoint);
+    console.log('Ovo je ta ključna tačka:', keyPoint);
     if (!keyPoint) {
       return res.status(404).json({ error: 'KeyPoint not found' });
     }
@@ -103,7 +105,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 // Objavljivanje ture
-router.post('/:tourId/publish', authMiddleware, async (req, res) => {
+router.post('/tour/:tourId/publish', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
     const tour = await Tour.findById(tourId).populate('keyPoints');

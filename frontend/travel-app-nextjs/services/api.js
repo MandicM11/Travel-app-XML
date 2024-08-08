@@ -202,7 +202,7 @@ export const getKeyPointById = async (id) => {
 
 export const createTour = async (tourData) => {
     try {
-        const response = await tourApi.post('/create-tour', tourData);
+        const response = await tourApi.post('/tour/create-tour', tourData);
         return response.data;
     } catch (error) {
         console.error('Error creating tour:', error.response ? error.response.data : error.message);
@@ -210,9 +210,9 @@ export const createTour = async (tourData) => {
     }
 };
 
-export const getTourById = async (tourId) => {
+export const getTourById = async (id) => {
     try {
-        const response = await tourApi.get(`/${tourId}`);
+        const response = await tourApi.get(`/tour/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching tour:', error.response ? error.response.data : error.message);
@@ -222,7 +222,7 @@ export const getTourById = async (tourId) => {
 
 export const addKeyPointToTour = async (tourId, keyPointId) => {
     try {
-        const response = await tourApi.post(`/${tourId}/keypoint`, { keyPointId });
+        const response = await tourApi.post(`/tour/${tourId}/keypoint`, { keyPointId });
         return response.data;
     } catch (error) {
         console.error('Error adding key point to tour:', error.response ? error.response.data : error.message);
@@ -232,7 +232,7 @@ export const addKeyPointToTour = async (tourId, keyPointId) => {
 
 export const publishTour = async (tourId) => {
     try {
-        const response = await tourApi.post(`/${tourId}/publish`);
+        const response = await tourApi.post(`/tour/${tourId}/publish`);
         return response.data;
     } catch (error) {
         console.error('Error publishing tour:', error.response ? error.response.data : error.message);
@@ -242,7 +242,7 @@ export const publishTour = async (tourId) => {
 
 export const getTours = async () => {
     try {
-        const response = await tourApi.get('/');
+        const response = await tourApi.get('/tour');
         return response.data;
     } catch (error) {
         console.error('Error fetching key points:', error.response ? error.response.data : error.message);
