@@ -17,8 +17,20 @@ router.get('/:tourId', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  console.log('GET /tours route hit');
+  try {
+    const tours = await Tour.find().populate( {path: 'keyPoints',
+      select: 'name'}); 
+    console.log('Tours:', tours);
+    res.status(200).json(tours);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Kreiranje ture u stanju "draft"
-router.post('/create', authMiddleware, async (req, res) => {
+router.post('/create-tour', authMiddleware, async (req, res) => {
   try {
     const { name, description, difficulty, tags } = req.body;
     const author = req.user.userId; // ID korisnika koji kreira turu

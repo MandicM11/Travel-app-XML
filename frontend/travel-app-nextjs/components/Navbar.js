@@ -40,6 +40,8 @@ const NavigationBar = () => {
               <Nav.Link as={Link} href="/follow" passHref key="follow">Follow Users</Nav.Link>
               <Nav.Link as={Link} href="/create-keypoint" passHref key="create-keypoint">Create Key Point</Nav.Link>
               <Nav.Link as={Link} href="/keypoints" passHref key="keypoints">Key Points</Nav.Link>
+              <Nav.Link as={Link} href="/create-tour" passHref key="create-tour">Create Tour</Nav.Link>
+              <Nav.Link as={Link} href="/tours" passHref key="tours">Tours</Nav.Link>
               <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }} key="logout">Logout</Nav.Link>
             </>
           )}

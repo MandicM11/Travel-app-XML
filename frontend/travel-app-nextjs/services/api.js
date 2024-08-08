@@ -17,28 +17,55 @@ const tourApi = axios.create({
     withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
 });
 
-// Interceptori za dodavanje JWT tokena u zaglavlje zahteva
-const addAuthInterceptor = (api) => {
-    api.interceptors.request.use(async (config) => {
-        try {
-            const session = await getSession();
-            if (session && session.user.accessToken) {
-                config.headers.Authorization = `Bearer ${session.user.accessToken}`;
-            }
-        } catch (error) {
-            console.error('Error fetching session:', error);
+// Interceptor za blogApi
+blogApi.interceptors.request.use(async (config) => {
+    try {
+        const session = await getSession();
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
+            console.log('Token iz blogApi interceptora: ', config.headers.Authorization);
         }
-        return config;
-    }, (error) => {
-        return Promise.reject(error);
-    });
-};
+    } catch (error) {
+        console.error('Error fetching session:', error);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
-addAuthInterceptor(blogApi);
-addAuthInterceptor(userApi);
-addAuthInterceptor(tourApi);
+// Interceptor za userApi
+userApi.interceptors.request.use(async (config) => {
+    try {
+        const session = await getSession();
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
+            console.log('Token iz userApi interceptora: ', config.headers.Authorization);
+        }
+    } catch (error) {
+        console.error('Error fetching session:', error);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
-export { blogApi, userApi, tourApi };
+// Interceptor za tourApi
+tourApi.interceptors.request.use(async (config) => {
+    try {
+        const session = await getSession();
+        if (session && session.user.accessToken) {
+            config.headers.Authorization = `Bearer ${session.user.accessToken}`;
+            console.log('Token iz tourApi interceptora: ', config.headers.Authorization);
+        }
+    } catch (error) {
+        console.error('Error fetching session:', error);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+
 
 // API pozivi za blog
 export const getBlogs = async () => {
@@ -46,7 +73,7 @@ export const getBlogs = async () => {
         const response = await blogApi.get('/blogs');
         return response.data;
     } catch (error) {
-        console.error('Error fetching blogs:', error);
+        console.error('Error fetching blogs:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
@@ -175,7 +202,7 @@ export const getKeyPointById = async (id) => {
 
 export const createTour = async (tourData) => {
     try {
-        const response = await tourApi.post('/create', tourData);
+        const response = await tourApi.post('/create-tour', tourData);
         return response.data;
     } catch (error) {
         console.error('Error creating tour:', error.response ? error.response.data : error.message);
@@ -212,3 +239,15 @@ export const publishTour = async (tourId) => {
         throw error;
     }
 };
+
+export const getTours = async () => {
+    try {
+        const response = await tourApi.get('/');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching key points:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export { blogApi, userApi, tourApi };

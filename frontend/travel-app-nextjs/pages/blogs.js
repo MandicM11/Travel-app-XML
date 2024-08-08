@@ -3,6 +3,7 @@ import { getBlogs } from '../services/api';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { userApi } from '../services/api';
+import { blogApi } from '../services/api';
 
 const BlogsPage = () => {
   const { data: session, status } = useSession();
@@ -13,18 +14,21 @@ const BlogsPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        if (status === 'loading') return;
-        const data = await getBlogs();
-        setBlogs(data);
+        if (status === 'authenticated' && session?.user?.accessToken) {
+          blogApi.defaults.headers.Authorization = `Bearer ${session.user.accessToken}`;
+          const data = await getBlogs();
+          setBlogs(data);
+        }
       } catch (error) {
         console.error('Error fetching blogs:', error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchBlogs();
-  }, [status]);
+  }, [status, session]);
+  
 
   const handleComment = async (blog) => {
     if (!session) {
