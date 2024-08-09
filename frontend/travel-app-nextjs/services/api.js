@@ -275,12 +275,22 @@ export const activateTour = async (tourId) => {
 
 export const getPublishedTours = async () => {
     try {
-      const response = await axios.get('/tour/published');
+      const response = await tourApi.get('/published');
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch published tours');
     }
   };
+
+  export const updateTourStatus  = async (tourId, status) => {
+    try {
+        const response = await tourApi.post(`/tour/${tourId}/${status}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating status of tour:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
 
 
 

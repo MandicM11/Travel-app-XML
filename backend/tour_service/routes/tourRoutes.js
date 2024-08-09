@@ -106,7 +106,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   return R * c;
 };
 
-router.post('/tour/:tourId/publish', authMiddleware, async (req, res) => {
+router.post('/tour/:tourId/published', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
     console.log('tour id za publish je: ', tourId);
@@ -130,7 +130,7 @@ router.post('/tour/:tourId/publish', authMiddleware, async (req, res) => {
 });
 
 // Ruta za arhiviranje ture
-router.post('/tour/:tourId/archive', authMiddleware, async (req, res) => {
+router.post('/tour/:tourId/archived', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
     const tour = await Tour.findById(tourId);
@@ -148,7 +148,7 @@ router.post('/tour/:tourId/archive', authMiddleware, async (req, res) => {
 });
 
 // Ruta za aktiviranje arhivirane ture
-router.post('/tour/:tourId/activate', authMiddleware, async (req, res) => {
+router.post('/tour/:tourId/activated', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
     const tour = await Tour.findById(tourId);

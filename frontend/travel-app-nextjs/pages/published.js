@@ -10,6 +10,7 @@ const PublishedTours = () => {
     const fetchTours = async () => {
       try {
         const data = await getPublishedTours();
+        console.log('Fetched tours:', data); // Dodaj ovo za ispis podataka
         setTours(data);
       } catch (err) {
         setError(err.message);
@@ -35,7 +36,7 @@ const PublishedTours = () => {
             <p>{tour.description}</p>
             <p>{tour.tags}</p>
             {tour.firstKeyPoint && <p>First Key Point: {tour.firstKeyPoint.name}</p>}
-            <p>Duration (by Walking): {tour.timeForTour.find(t => t.mode === 'WALKING')?.duration} min</p>
+            
             {/* Prikaži dodatne informacije ako je potrebno */}
           </li>
         ))}
