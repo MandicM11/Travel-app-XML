@@ -84,6 +84,8 @@ router.post('/tour/:tourId/keypoint', authMiddleware, async (req, res) => {
       const currentPoint = keyPoint;
       tour.length += calculateDistance(prevPoint.latitude, prevPoint.longitude, currentPoint.latitude, currentPoint.longitude);
     }
+
+    
     await tour.save();
     res.status(201).json(tour);
   } catch (error) {
@@ -104,29 +106,84 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   return R * c;
 };
 
-// Objavljivanje ture
 router.post('/tour/:tourId/publish', authMiddleware, async (req, res) => {
   try {
     const { tourId } = req.params;
-    const tour = await Tour.findById(tourId).populate('keyPoints');
+    console.log('tour id za publish je: ', tourId);
+    const tour = await Tour.findById(tourId);
     if (!tour) {
-      return res.status(404).json({ error: 'Tour not found' });
+      return res.status(404).json({ message: 'Tour not found' });
     }
 
-    // Provera da li je trenutni korisnik autor ture
-    if (tour.author.toString() !== req.user.userId) {
-      return res.status(403).json({ error: 'Forbidden: You are not the author of this tour' });
+    if (tour.keyPoints.length < 2) {
+      return res.status(400).json({ message: 'Tour must have at least two key points to be published.' });
     }
 
-    if (!tour.name || !tour.description || !tour.difficulty || tour.keyPoints.length < 2) {
-      return res.status(400).json({ error: 'Tour must have name, description, difficulty and at least two key points' });
-    }
-
-    tour.status = 'published';
+    tour.updateTimeForTour();
+    tour.publish();
     await tour.save();
-    res.status(200).json(tour);
+
+    res.status(200).json({ message: 'Tour published successfully', tour });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Ruta za arhiviranje ture
+router.post('/tour/:tourId/archive', authMiddleware, async (req, res) => {
+  try {
+    const { tourId } = req.params;
+    const tour = await Tour.findById(tourId);
+    if (!tour) {
+      return res.status(404).json({ message: 'Tour not found' });
+    }
+
+    tour.archive();
+    await tour.save();
+
+    res.status(200).json({ message: 'Tour archived successfully', tour });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Ruta za aktiviranje arhivirane ture
+router.post('/tour/:tourId/activate', authMiddleware, async (req, res) => {
+  try {
+    const { tourId } = req.params;
+    const tour = await Tour.findById(tourId);
+    if (!tour) {
+      return res.status(404).json({ message: 'Tour not found' });
+    }
+
+    tour.activate();
+    await tour.save();
+
+    res.status(200).json({ message: 'Tour activated successfully', tour });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Ruta za dohvatanje objavljenih tura
+router.get('/published', async (req, res) => {
+  try {
+    const tours = await Tour.find({ status: 'published' })
+      .select('name description tags keyPoints timeForTour')
+      .populate('keyPoints', 'name') // Uzimamo samo ime ključne tačke
+      .exec();
+
+    const toursWithLimitedInfo = tours.map(tour => ({
+      name: tour.name,
+      description: tour.description,
+      tags: tour.tags,
+      firstKeyPoint: tour.keyPoints[0],
+      timeForTour: tour.timeForTour,
+    }));
+
+    res.status(200).json(toursWithLimitedInfo);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

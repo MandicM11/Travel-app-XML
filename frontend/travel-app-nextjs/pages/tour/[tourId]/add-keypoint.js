@@ -1,7 +1,6 @@
-// pages/tour/[tourId]/add-keypoint.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { addKeyPointToTour } from '../../../services/api';
+import { getKeyPoints, addKeyPointToTour } from '../../../services/api';
 
 const AddKeyPoint = () => {
   const router = useRouter();
@@ -14,8 +13,7 @@ const AddKeyPoint = () => {
       if (!tourId) return;
 
       try {
-        // Pretpostavljamo da postoji API za dobijanje ključnih tačaka
-        const data = await getKeyPoints();
+        const data = await getKeyPoints();  // Pretpostavka da postoji funkcija getKeyPoints u API-ju
         setKeyPoints(data);
       } catch (err) {
         console.error('Error fetching key points:', err.message);

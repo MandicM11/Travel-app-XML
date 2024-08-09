@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { getTours } from '../services/api'; // Prilagodi putanju ako je potrebno
+import { getPublishedTours } from '../services/api';
 
-const Tours = () => {
+const PublishedTours = () => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const data = await getTours(); // Funkcija za dobijanje svih tura
+        const data = await getPublishedTours();
         setTours(data);
       } catch (err) {
         setError(err.message);
@@ -23,28 +21,22 @@ const Tours = () => {
     fetchTours();
   }, []);
 
-  const handleViewDetails = (tourId) => {
-    router.push(`/tour/${tourId}`);
-  };
-
-  const handleAddKeyPoint = (tourId) => {
-    router.push(`/tour/${tourId}/add-keypoint`);
-  };
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   if (tours.length === 0) return <p>No tours found</p>;
 
   return (
     <div>
-      <h1>All Tours</h1>
+      <h1>Published Tours</h1>
       <ul>
         {tours.map((tour) => (
           <li key={tour._id}>
             <h2>{tour.name}</h2>
             <p>{tour.description}</p>
-            <button onClick={() => handleViewDetails(tour._id)}>View Details</button>
-            <button onClick={() => handleAddKeyPoint(tour._id)}>Add Key Point</button>
+            <p>{tour.tags}</p>
+            {tour.firstKeyPoint && <p>First Key Point: {tour.firstKeyPoint.name}</p>}
+            <p>Duration (by Walking): {tour.timeForTour.find(t => t.mode === 'WALKING')?.duration} min</p>
+            {/* Prikaži dodatne informacije ako je potrebno */}
           </li>
         ))}
       </ul>
@@ -52,4 +44,4 @@ const Tours = () => {
   );
 };
 
-export default Tours;
+export default PublishedTours;

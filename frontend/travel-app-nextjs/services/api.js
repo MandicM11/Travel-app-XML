@@ -230,15 +230,6 @@ export const addKeyPointToTour = async (tourId, keyPointId) => {
     }
 };
 
-export const publishTour = async (tourId) => {
-    try {
-        const response = await tourApi.post(`/tour/${tourId}/publish`);
-        return response.data;
-    } catch (error) {
-        console.error('Error publishing tour:', error.response ? error.response.data : error.message);
-        throw error;
-    }
-};
 
 export const getTours = async () => {
     try {
@@ -249,5 +240,50 @@ export const getTours = async () => {
         throw error;
     }
 };
+
+export const publishTour = async (tourId) => {
+    try {
+        const response = await tourApi.post(`/tour/${tourId}/publish`);
+        return response.data;
+    } catch (error) {
+        console.error('Error publishing tour:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+
+
+export const archiveTour = async (tourId) => {
+    try {
+        const response = await tourApi.post(`/tour/${tourId}/archive`);
+        return response.data;
+    } catch (error) {
+        console.error('Error archiving key points:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const activateTour = async (tourId) => {
+    try {
+        const response = await tourApi.post(`/tour/${tourId}/activate`);
+        return response.data;
+    } catch (error) {
+        console.error('Error activate tour:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const getPublishedTours = async () => {
+    try {
+      const response = await axios.get('/tour/published');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch published tours');
+    }
+  };
+
+
+
+
 
 export { blogApi, userApi, tourApi };
