@@ -21,6 +21,7 @@ const authMiddleware = (req, res, next) => {
         if (req.user.role !== 'author') {
             
             return res.status(403).send({ error: 'Forbidden: You do not have the required role' });
+            //samo autori vide ture koje nisu bulished
         }
 
         next();
