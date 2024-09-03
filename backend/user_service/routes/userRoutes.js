@@ -73,4 +73,52 @@ router.post('/login', async (req, res) => {
     }
   });
 
+  router.post('/simulator', async (req, res) => {
+    const { lat, long } = req.body;
+    
+    try {
+        const token = req.cookies['next-auth.session-token'];
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.currentPosition = { lat, long };
+        await user.save();
+
+        res.status(200).json({ message: 'Location saved', lat, long });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Ruta za dobavljanje trenutne pozicije korisnika
+router.get('/simulator/current', async (req, res) => {
+    try {
+        const token = req.cookies['next-auth.session-token'];
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId);
+        if (!user || !user.currentPosition) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        res.status(200).json(user.currentPosition);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 module.exports = router;

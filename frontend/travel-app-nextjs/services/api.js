@@ -290,7 +290,29 @@ export const getPublishedTours = async () => {
         console.error('Error updating status of tour:', error.response ? error.response.data : error.message);
         throw error;
     }
+
+    
 };
+// Funkcija za slanje lokacije na backend
+export const saveLocation = async ({ lat, lng }) => {
+    try {
+      const response = await userApi.post('/simulator', { lat, long: lng });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+  
+  // Funkcija za dohvat trenutne lokacije
+  export const getCurrentLocation = async () => {
+    try {
+      const response = await userApi.get('/simulator/current');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 
 
 

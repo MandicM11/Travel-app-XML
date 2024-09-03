@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, required: true },
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    currentPosition: {
+        lat: { type: Number, default: null },
+        long: { type: Number, default: null }
+    }
 }, { collection: 'users' }); // Eksplicitno postavljanje imena kolekcije
 
 const User = mongoose.model('User', userSchema);

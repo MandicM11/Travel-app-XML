@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { saveLocation } from '../services/api'; // Proveri putanju do fajla
+import { saveLocation, getCurrentLocation } from '../services/api'; // Proveri putanju do fajla
 
 // Kreirajte ikonu za marker
 const markerIcon = new L.Icon({
@@ -29,6 +29,19 @@ const LocationMarker = ({ position, setPosition }) => {
 const Simulator = () => {
   const [position, setPosition] = useState(null);
 
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const location = await getCurrentLocation();
+        setPosition({ lat: location.lat, lng: location.long });
+      } catch (error) {
+        console.error('Error fetching current location:', error);
+      }
+    };
+
+    fetchLocation();
+  }, []);
+
   const handleSaveLocation = async () => {
     try {
       if (position) {
@@ -44,7 +57,7 @@ const Simulator = () => {
   return (
     <div>
       <h1>Position Simulator</h1>
-      <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '500px', width: '100%' }}>
+      <MapContainer center={position || [51.505, -0.09]} zoom={13} style={{ height: '500px', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
