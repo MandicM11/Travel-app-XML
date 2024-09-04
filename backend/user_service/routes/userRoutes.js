@@ -3,10 +3,13 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
+const authMiddleware = require('../middleware/authMiddleware');
+
 const SECRET_KEY = process.env.JWT_SECRET; // Koristite varijablu okruženja za tajni ključ
 
 // Ruta za dobavljanje svih korisnika
-router.get('/users', async (req, res) => {
+router.get('/users',  async (req, res) => {
     try {
         const users = await User.find().select('-password'); // Isključujemo polje password
         res.send(users);
@@ -28,18 +31,30 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Registracija korisnika
 router.post('/register', async (req, res) => {
     try {
         const { firstName, lastName, profilePicture, bio, motto, email, password, role } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ firstName, lastName, profilePicture, bio, motto, email, password: hashedPassword, role });
+
+        try {
+            const response = await axios.post('http://api-gateway:8000/tour-service/cart', {
+                userId: user._id
+            });
+            console.log('Cart creation response:', response.data);
+        } catch (error) {
+            console.error('Error creating cart:', error.response ? error.response.data : error.message);
+            throw new Error('Failed to create cart');
+        }
+        
         await user.save();
         res.status(201).send({ message: 'User registered successfully' });
     } catch (error) {
+        console.error('Registration error:', error.message);
         res.status(400).send({ error: error.message });
     }
 });
+
 
 // Prijava korisnika
 router.post('/login', async (req, res) => {
@@ -73,7 +88,7 @@ router.post('/login', async (req, res) => {
     }
   });
 
-  router.post('/simulator', async (req, res) => {
+  router.post('/simulator',authMiddleware, async (req, res) => {
     const { lat, long } = req.body;
     
     try {
@@ -100,7 +115,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Ruta za dobavljanje trenutne pozicije korisnika
-router.get('/simulator/current', async (req, res) => {
+router.get('/simulator/current',authMiddleware, async (req, res) => {
     try {
         const token = req.cookies['next-auth.session-token'];
         if (!token) {

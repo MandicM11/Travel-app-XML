@@ -31,9 +31,10 @@ mongoose.connect('mongodb://mongo:27017/touristDB', {
     console.error('Failed to connect to MongoDB', err);
 });
 
-// Koristi rute
-app.use(userRoutes); // Rute za korisnike
-app.use(authMiddleware, followRoutes); // Autentifikacija za /follow rute
+
+app.use(followRoutes);
+app.use(userRoutes);
+
 
 const PORT = process.env.PORT || 8001;
 app.listen(PORT, () => {

@@ -9,6 +9,7 @@ const CreateTourPage = () => {
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [tags, setTags] = useState('');
+  const [price, setPrice] = useState(''); // Dodano stanje za cenu
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -24,6 +25,7 @@ const CreateTourPage = () => {
         description,
         difficulty,
         tags: tagsArray,
+        price: parseFloat(price) // Dodano polje za cenu
       };
 
       await createTour(tourData); // Napravi API poziv za kreiranje ture
@@ -59,6 +61,16 @@ const CreateTourPage = () => {
         <div>
           <label>Tags:</label>
           <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Comma separated" />
+        </div>
+        <div>
+          <label>Price:</label>
+          <input 
+            type="number" 
+            step="0.01" // Omogućava decimalne brojeve
+            value={price} 
+            onChange={(e) => setPrice(e.target.value)} 
+            required 
+          />
         </div>
         {error && <p>Error: {error}</p>}
         <button type="submit" disabled={loading}>

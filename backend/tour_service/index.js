@@ -37,8 +37,9 @@ mongoose.connect('mongodb://mongo:27017/touristDB', {
 });
 
 // Koristi rute
-app.use(authMiddleware, keyPointRoutes); // Autentifikacija za /keypoints rute
-app.use(authMiddleware, tourRoutes);
+app.use(keyPointRoutes);
+app.use(tourRoutes);
+
 
 const PORT = process.env.PORT || 8003;
 app.listen(PORT, () => {

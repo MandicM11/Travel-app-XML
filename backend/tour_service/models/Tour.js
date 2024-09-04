@@ -53,6 +53,10 @@ const tourSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  price: {
+    type: Number,
+    required: true,
+  },
 });
 
 tourSchema.methods.publish = function() {

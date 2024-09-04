@@ -2,7 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Tour = require('../models/Tour');
 const KeyPoint = require('../models/KeyPoint');
-const authMiddleware = require('../middleware/authMiddleware'); // Importovanje authMiddleware-a
+const Cart = require('../models/Cart');
+const OrderItem = require('../models/OrderItem');
+const TourPurchaseToken = require('../models/TourPurchaseToken'); 
+const authMiddleware = require('../middleware/authMiddleware'); 
+const mongoose = require('mongoose');
+const crypto = require('crypto');
+
+
+function generateRandomToken(length = 32) {
+  return crypto.randomBytes(length).toString('hex');
+}
 
 // Dohvat jedne ture po ID-u
 router.get('/tour/:tourId', async (req, res) => {
@@ -35,7 +45,7 @@ router.get('/tour', async (req, res) => {
 // Kreiranje ture u stanju "draft"
 router.post('/tour/create-tour', authMiddleware, async (req, res) => {
   try {
-    const { name, description, difficulty, tags } = req.body;
+    const { name, description, difficulty, tags, price } = req.body;
     const author = req.user.userId; // ID korisnika koji kreira turu
 
     const newTour = new Tour({
@@ -43,7 +53,8 @@ router.post('/tour/create-tour', authMiddleware, async (req, res) => {
       description,
       difficulty,
       tags,
-      author // Postavite autora
+      price,
+      author
     });
 
     await newTour.save();
@@ -186,5 +197,157 @@ router.get('/published', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+// Ruta za kreiranje korpe
+router.post('/cart', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    console.log('Kreiranje korpe za korisnika:', userId); // Loguj userId
+    const newCart = new Cart({
+      userId,
+      items: [],
+      totalPrice: 0,
+      status: 'pending',
+      createdAt: new Date()
+    });
+
+    await newCart.save();
+    console.log('Korpa kreirana:', newCart); // Loguj kreiranu korpu
+    res.status(201).json({ cart: newCart });
+  } catch (err) {
+    console.error('Greška prilikom kreiranja korpe:', err.message); // Loguj grešku
+    res.status(500).json({ message: 'Error creating cart.' });
+  }
+});
+
+
+
+
+
+router.post('/cart/:cartId/items', async (req, res) => {
+  const { cartId } = req.params;
+  const { tourId, quantity } = req.body;
+
+  try {
+    console.log(`Received request to add item to cart. Cart ID: ${cartId}, Tour ID: ${tourId}, Quantity: ${quantity}`);
+
+    // Pronađi korpu
+    const cart = await Cart.findById(new mongoose.Types.ObjectId(cartId));
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found.' });
+    }
+
+    // Pronađi ili kreiraj novu stavku
+    let orderItem = await OrderItem.findOne({ cartId: new mongoose.Types.ObjectId(cartId), tourId: new mongoose.Types.ObjectId(tourId) });
+    if (orderItem) {
+      console.log(`Item already in cart. Updating quantity: Tour ID: ${tourId}, New Quantity: ${orderItem.quantity + quantity}`);
+      orderItem.quantity += quantity;
+    } else {
+      console.log(`Item not in cart. Adding new item: Tour ID: ${tourId}, Quantity: ${quantity}`);
+      const tour = await Tour.findById(new mongoose.Types.ObjectId(tourId));
+      if (!tour) {
+        return res.status(404).json({ message: 'Tour not found.' });
+      }
+      orderItem = new OrderItem({
+        cartId: new mongoose.Types.ObjectId(cartId),
+        tourId: new mongoose.Types.ObjectId(tourId),
+        tourName: tour.name,
+        price: tour.price,
+        quantity: quantity
+      });
+    }
+
+    // Sačuvaj ili ažuriraj stavku
+    await orderItem.save();
+
+    // Ažuriraj korpu
+    if (!cart.items.includes(orderItem._id)) {
+      cart.items.push(orderItem._id);
+    }
+    cart.status = 'pending';
+    cart.totalPrice += orderItem.price * quantity;
+    await cart.save();
+
+    res.status(200).json({ cart });
+  } catch (err) {
+    console.error('Error updating cart:', err);
+    res.status(500).json({ message: 'Error updating cart.' });
+  }
+});
+
+
+
+router.delete('/cart/:cartId/items/:itemId', async (req, res) => {
+  const { cartId, itemId } = req.params;
+
+  try {
+    const cart = await Cart.findById(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found.' });
+    }
+
+    const itemIndex = cart.items.findIndex(item => item.toString() === itemId);
+
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: 'Item not found in cart.' });
+    }
+
+    // Oduzmi cenu od ukupne cene
+    const item = await OrderItem.findById(itemId);
+    if (item) {
+      cart.totalPrice -= item.price * item.quantity;
+    }
+
+    // Ukloni stavku iz korpe
+    cart.items.splice(itemIndex, 1);
+    await cart.save();
+    res.status(200).json({ cart });
+  } catch (err) {
+    res.status(500).json({ message: 'Error removing item from cart.' });
+  }
+});
+
+// Ruta za checkout
+router.post('/cart/checkout', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const cart = await Cart.findOne({ userId: new mongoose.Types.ObjectId(userId), status: 'pending' }).populate('items');
+
+    console.log('Cart:', cart);
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ message: 'Your cart is empty.' });
+    }
+
+    const purchaseTokens = [];
+    for (let item of cart.items) {
+      const token = new TourPurchaseToken({
+        userId,
+        tourId: item.tourId,
+        purchaseDate: new Date(),
+        token: generateRandomToken(),
+      });
+      await token.save();
+      purchaseTokens.push(token);
+    }
+    await OrderItem.deleteMany({ _id: { $in: cart.items.map(item => item._id) } });
+    cart.status = 'pending';
+    cart.items = []; // Isprazni stavke
+    cart.totalPrice = 0; // Postavi cenu na 0
+    await cart.save();
+    res.status(200).json({ purchaseTokens });
+  } catch (err) {
+    console.error('Error during checkout:', err);
+    res.status(500).json({ message: 'Error during checkout.' });
+  }
+});
+
+
+
+
 
 module.exports = router;

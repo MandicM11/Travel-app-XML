@@ -38,6 +38,7 @@ const TourDetail = () => {
       <p>Difficulty: {tour.difficulty}</p>
       <p>Length: {tour.length}</p>
       <p>Key Points: {tour.keyPoints.map(point => <span key={point._id}>{point.name}</span>)}</p>
+      <p>Price: {tour.price}</p>
     </div>
   );
 };
