@@ -10,6 +10,9 @@ const blogApi = axios.create({
 const userApi = axios.create({
     baseURL: 'http://localhost:8000/user-service',
     withCredentials: true, // Ako koristiš kolačiće za autentifikaciju
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 const tourApi = axios.create({
@@ -295,8 +298,9 @@ export const getPublishedTours = async () => {
 };
 // Funkcija za slanje lokacije na backend
 export const saveLocation = async ({ lat, lng }) => {
+    console.log('Sending data:', { lat, lng });
     try {
-      const response = await userApi.post('/simulator', { lat, long: lng });
+      const response = await userApi.post('/simulator', { lat, lng});
       return response.data;
     } catch (error) {
       throw error;

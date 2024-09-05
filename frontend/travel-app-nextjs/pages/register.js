@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router'; // Import useRouter
 import { registerUser } from '../services/api';
 
 const Register = () => {
@@ -13,6 +14,8 @@ const Register = () => {
         role: 'tourist'
     });
 
+    const router = useRouter(); // Initialize useRouter
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -21,7 +24,8 @@ const Register = () => {
         e.preventDefault();
         try {
             const response = await registerUser(formData);
-           
+            // Redirect to login page after successful registration
+            router.push('/login');
         } catch (error) {
             console.error('Error registering user:', error);
         }

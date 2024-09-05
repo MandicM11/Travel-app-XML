@@ -88,15 +88,26 @@ router.post('/login', async (req, res) => {
     }
   });
 
-  router.post('/simulator',authMiddleware, async (req, res) => {
-    const { lat, long } = req.body;
-    
+  router.post('/simulator', async (req, res) => {
+    const { lat, lng } = req.body;
+
+    // Loguj tipove lat i lng
+    console.log('Received lat:', lat, 'Type of lat:', typeof lat);
+    console.log('Received lng:', lng, 'Type of lng:', typeof lng);
+
+    // Proveri da li su lat i lng brojevi
+    if (typeof lat !== 'number' || typeof lng !== 'number') {
+        return res.status(400).json({ message: 'Invalid data type' });
+    }
+
     try {
-        const token = req.cookies['next-auth.session-token'];
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
+        console.log('Parsed lat:', lat, 'Parsed lng:', lng);
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
@@ -105,19 +116,22 @@ router.post('/login', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        user.currentPosition = { lat, long };
+        user.currentPosition = { lat, lng };
         await user.save();
 
-        res.status(200).json({ message: 'Location saved', lat, long });
+        res.status(200).json({ message: 'Location saved', lat, lng });
     } catch (error) {
+        console.error('Error:', error); // Prikazuj detaljnije greške
         res.status(400).json({ error: error.message });
     }
 });
 
+
 // Ruta za dobavljanje trenutne pozicije korisnika
-router.get('/simulator/current',authMiddleware, async (req, res) => {
+router.get('/simulator/current', async (req, res) => {
     try {
-        const token = req.cookies['next-auth.session-token'];
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
         }

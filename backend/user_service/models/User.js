@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     currentPosition: {
         lat: { type: Number, default: null },
-        long: { type: Number, default: null }
+        lng: { type: Number, default: null }
     }
 }, { collection: 'users' }); // Eksplicitno postavljanje imena kolekcije
 
