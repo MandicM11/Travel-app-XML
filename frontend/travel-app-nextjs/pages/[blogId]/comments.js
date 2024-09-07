@@ -27,7 +27,7 @@ const CommentsPage = () => {
             fetchComments();
         }
     }, [blogId, session?.user.accessToken]);
-//debug this
+//debug this not working
     const handleCommentSubmit = async () => {
         if (!session) {
             alert('You need to be logged in to comment.');
