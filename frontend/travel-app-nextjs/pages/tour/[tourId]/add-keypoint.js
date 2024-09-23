@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getKeyPoints, addKeyPointToTour } from '../../../services/api';
-
+//handle keypoint creation debug
 const AddKeyPoint = () => {
   const router = useRouter();
   const { tourId } = router.query;
