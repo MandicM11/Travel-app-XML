@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 //TODO fix keypoints on front
 //fixed keypoints
 // add some css
+//keypoints improvement TODO
 const KeyPointsPage = () => {
   const { data: session, status } = useSession();
   const [keyPoints, setKeyPoints] = useState([]);
