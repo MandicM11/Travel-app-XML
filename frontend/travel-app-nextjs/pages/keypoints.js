@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getKeyPoints, getTours, addKeyPointToTour } from '../services/api'; // Prilagodi putanju ako je potrebno
 import { useSession } from 'next-auth/react';
-//TODO fix keypoints on front
-//fixed keypoints
-// add some css
-//keypoints improvement TODO
+
 const KeyPointsPage = () => {
   const { data: session, status } = useSession();
   const [keyPoints, setKeyPoints] = useState([]);
