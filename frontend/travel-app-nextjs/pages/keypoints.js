@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getKeyPoints, getTours, addKeyPointToTour } from '../services/api'; // Prilagodi putanju ako je potrebno
 import { useSession } from 'next-auth/react';
-
+//keypoints stil bugged TODO check request from backend and match it with front
 const KeyPointsPage = () => {
   const { data: session, status } = useSession();
   const [keyPoints, setKeyPoints] = useState([]);
